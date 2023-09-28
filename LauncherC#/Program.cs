@@ -11,8 +11,8 @@ namespace LauncherC_
     {
       ApiDataService apiDataService = new ApiDataService();
 
-      Console.WriteLine("Загрузка apiDataService.GetVersion()");
-      var apiVersion = await apiDataService.GetVersion();
+      Console.WriteLine("Загрузка apiDataService.GetActualVersion()");
+      var apiVersion = await apiDataService.GetActualVersion();
       Console.WriteLine($"{apiVersion.hash} | {apiVersion.version}");
 
       Console.WriteLine("Загрузка apiDataService.GetData()");

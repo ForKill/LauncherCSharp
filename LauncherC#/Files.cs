@@ -1,11 +1,9 @@
 ﻿namespace LauncherC_
 {
-  public class Files
+  public class Files : ApiData
   {
-    private string Name { get; set; }
-    private string Path { get; set; }
-    private string Hash { get; set; }
-    private int Size { get; set; }
-    private int Update { get; set; }
+    private bool IsEx { get; set; }
+
+
   }
 }

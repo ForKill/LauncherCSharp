@@ -2,13 +2,13 @@
 {
   public class Download
   {
-    private string Url;
-    private string FileName;
+    public string Url;
+    public ApiData ApiData;
 
-    public Download(string url, string fileName)
+    public Download(string url, ApiData apiData)
     {
       Url = url;
-      FileName = fileName;
+      ApiData = apiData;
     }
   }
 }

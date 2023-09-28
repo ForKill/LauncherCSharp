@@ -3,11 +3,11 @@ namespace LauncherC_
 {
   public class ApiData
   {
-    public string name { get; set; }
-    public string path { get; set; }
-    public string hash { get; set; }
-    public long size { get; set; }
-    public bool read { get; set; }
+    public string Name { get; set; }
+    public string Path { get; set; }
+    public string Hash { get; set; }
+    public long Size { get; set; }
+    public bool Read { get; set; }
   }
 
   public class ApiDataRoot
@@ -17,7 +17,7 @@ namespace LauncherC_
 
   public class ApiDataApp
   {
-    public string hash { get; set; }
-    public int version { get; set; }
+    public string Hash { get; set; }
+    public int Version { get; set; }
   }
 }
