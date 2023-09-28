@@ -1,6 +1,6 @@
 ﻿namespace LauncherC_
 {
-  internal class Download
+  public class Download
   {
     private string Url;
     private string FileName;
