@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,6 +17,7 @@ namespace LauncherC_
     private Queue<Download> downloads;
     private List<Task<Download>> tasks = new List<Task<Download>>();
     public DownloadService() => downloads = new Queue<Download>();
+    private Stopwatch stopwatch = new Stopwatch();
 
     public async Task AddDownloadQueue(string fullPathName, ApiData apiData)
     {
@@ -39,6 +42,8 @@ namespace LauncherC_
         Directory.CreateDirectory(filePath);
 
       string fileName = filePath + "\\" + download.ApiData.Name;
+
+      stopwatch.Start();
       await DownloadFile(download.Url, fileName);
       await StartDownload();
     }
@@ -49,36 +54,16 @@ namespace LauncherC_
       {
         using (var client = new WebClient())
         {
-          client.DownloadFileCompleted += (sender, args) => ComplitedCallback(path, sender, args);
-          client.DownloadProgressChanged += (sender, args) => ProgressCallback(path, sender, args);
+          DownloadEvents downloadEvents = new DownloadEvents();
+          client.DownloadProgressChanged += (sender, args) => downloadEvents.ProgressCallback(path, sender, args, stopwatch);
+          client.DownloadFileCompleted += (sender, args) => downloadEvents.ComplitedCallback(path, sender, args, stopwatch);
           await client.DownloadFileTaskAsync(new Uri(url), path);
-
         }
       }
       catch (Exception ex)
       {
         Console.WriteLine(ex.Message);
       }
-
-    }
-
-    private void ComplitedCallback(string path, object? sender, AsyncCompletedEventArgs asyncCompletedEventArgs)
-    {
-      Console.WriteLine($"Загрузка завершена. ({path})");
-      Console.WriteLine("/exit - Завершить работу программы");
-
-      if (asyncCompletedEventArgs.Cancelled)
-        Console.WriteLine("Загрузка отменена.");
-
-      if (asyncCompletedEventArgs.Error != null)
-        Console.WriteLine($"Ошибка загрузки: {asyncCompletedEventArgs.Error.ToString()}");
-    }
-
-    private void ProgressCallback(string path, object? sender, DownloadProgressChangedEventArgs downloadProgressChangedEventArgs)
-    {
-      Console.WriteLine($"Запрошенноебакетов: {downloadProgressChangedEventArgs.TotalBytesToReceive}");
-      Console.WriteLine($"Полученноебакетов: {downloadProgressChangedEventArgs.BytesReceived}");
-      Console.WriteLine($"Процент: {downloadProgressChangedEventArgs.ProgressPercentage}");
     }
   }
 }
