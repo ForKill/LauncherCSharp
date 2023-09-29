@@ -11,6 +11,7 @@ namespace LauncherC_
     {
       ApiDataService apiDataService = new ApiDataService();
       DownloadService downloadService = new DownloadService();
+      FilesService filesService = new FilesService();
 
       Console.WriteLine("Загрузка apiDataService.GetActualVersion()");
       var apiVersion = await apiDataService.GetActualVersion();
@@ -34,6 +35,14 @@ namespace LauncherC_
         Console.WriteLine($"{download.Url} | {download.ApiData.Name}");
       }
       await downloadService.StartDownload();
+
+      await filesService.CheckFiles();
+      downloadList = await downloadService.GetDownloadQueue();
+
+      foreach (var download in downloadList)
+      {
+        Console.WriteLine($"ПОВТНОРНАЯ ПРОВЕРКА {download.Url} | {download.ApiData.Name}");
+      }
     }
   }
 }

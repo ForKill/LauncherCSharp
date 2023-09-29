@@ -15,5 +15,6 @@ namespace LauncherC_
     public const string FilesHash = Api + "hash";
     public const string AppUpdate = Api + "appupdate";
     public string FilesPath { get; } = AppDomain.CurrentDomain.BaseDirectory + "Education\\";
+    public string FilesSave { get; } = AppDomain.CurrentDomain.BaseDirectory + "files.json";
   }
 }

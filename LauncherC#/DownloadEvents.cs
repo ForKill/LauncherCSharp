@@ -11,15 +11,17 @@ namespace LauncherC_
 {
   public class DownloadEvents
   {
-    public void ProgressCallback(string path, object? sender, DownloadProgressChangedEventArgs downloadProgressChangedEventArgs, Stopwatch stopwatch)
+    public async Task ProgressCallbackAsync(ApiData apiData, object? sender, DownloadProgressChangedEventArgs downloadProgressChangedEventArgs, Stopwatch stopwatch)
     {
       Console.WriteLine($"Прогресс: {downloadProgressChangedEventArgs.BytesReceived} / {downloadProgressChangedEventArgs.TotalBytesToReceive} ({downloadProgressChangedEventArgs.ProgressPercentage}%)");
       Console.WriteLine($"Скорость: {Utils.GetDownloadSpeed(downloadProgressChangedEventArgs.BytesReceived, stopwatch.Elapsed.TotalSeconds)}");
+
+      await Task.Yield();
     }
 
-    public void ComplitedCallback(string path, object? sender, AsyncCompletedEventArgs asyncCompletedEventArgs, Stopwatch stopwatch)
+    public async Task ComplitedCallbackAsync(ApiData apiData, object? sender, AsyncCompletedEventArgs asyncCompletedEventArgs, Stopwatch stopwatch)
     {
-      Console.WriteLine($"Загрузка завершена за {stopwatch.Elapsed.TotalSeconds}. ({path})");
+      Console.WriteLine($"Загрузка завершена за {stopwatch.Elapsed.TotalSeconds}. ({apiData.Name})");
 
       if (asyncCompletedEventArgs.Cancelled)
         Console.WriteLine("Загрузка отменена.");
@@ -28,7 +30,8 @@ namespace LauncherC_
         Console.WriteLine($"Ошибка загрузки: {asyncCompletedEventArgs.Error.ToString()}");
 
       FilesService filesService = new FilesService();
-       filesService.AddFile(path);
+      await filesService.Add(apiData);
+      await Task.Yield();
     }
   }
 }

@@ -18,6 +18,7 @@ namespace LauncherC_
     private List<Task<Download>> tasks = new List<Task<Download>>();
     public DownloadService() => downloads = new Queue<Download>();
     private Stopwatch stopwatch = new Stopwatch();
+    Config config = new Config();
 
     public async Task AddDownloadQueue(string fullPathName, ApiData apiData)
     {
@@ -33,7 +34,6 @@ namespace LauncherC_
     {
       if (downloads.Count == 0)
         return;
-      Config config = new Config();
 
       var download = downloads.Dequeue();
 
@@ -41,26 +41,25 @@ namespace LauncherC_
       if (Directory.Exists(filePath) == false)
         Directory.CreateDirectory(filePath);
 
-      string fileName = filePath + "\\" + download.ApiData.Name;
-
       stopwatch.Start();
-      await DownloadFile(download.Url, fileName);
+      await DownloadFile(download.Url, download.ApiData);
       await StartDownload();
     }
 
-    public async Task DownloadFile(string url, string path)
+    public async Task DownloadFile(string url, ApiData apiData)
     {
       try
       {
+        string path = config.FilesPath + "\\" + apiData.Name;
         using (var client = new WebClient())
         {
           DownloadEvents downloadEvents = new DownloadEvents();
 
-          client.DownloadProgressChanged += (sender, args) => 
-            downloadEvents.ProgressCallback(path, sender, args, stopwatch);
+          client.DownloadProgressChanged += async (sender, args) => 
+            downloadEvents.ProgressCallbackAsync(apiData, sender, args, stopwatch);
 
-          client.DownloadFileCompleted += (sender, args) => 
-            downloadEvents.ComplitedCallback(path, sender, args, stopwatch);
+          client.DownloadFileCompleted += async (sender, args) => 
+            downloadEvents.ComplitedCallbackAsync(apiData, sender, args, stopwatch);
 
           await client.DownloadFileTaskAsync(new Uri(url), path);
         }
