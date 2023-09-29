@@ -13,7 +13,7 @@ namespace LauncherC_
 
     private List<Files> files = new List<Files>();
 
-    public async Task AddFile(string path)
+    public async Task AddFile(string path, ApiData apiData)
     {
       FileInfo fileInfo = new FileInfo(path);
       Console.WriteLine(fileInfo.Length);
