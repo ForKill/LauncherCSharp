@@ -10,18 +10,30 @@ namespace LauncherC_
     static async Task Main(string[] args)
     {
       ApiDataService apiDataService = new ApiDataService();
+      DownloadService downloadService = new DownloadService();
 
       Console.WriteLine("Загрузка apiDataService.GetActualVersion()");
       var apiVersion = await apiDataService.GetActualVersion();
-      Console.WriteLine($"{apiVersion.hash} | {apiVersion.version}");
+      Console.WriteLine($"{apiVersion.Hash} | {apiVersion.Version}");
 
       Console.WriteLine("Загрузка apiDataService.GetData()");
       Dictionary<string, ApiData> apiData = await apiDataService.GetData();
 
+      Console.WriteLine("Удаляем лишние файлы apiDataService.RemoveUnnecessaryFiles()");
+      await apiDataService.RemoveUnnecessaryFiles();
+
       foreach (var apidata in apiData)
       {
-        Console.WriteLine($"{apidata.Key} | {apidata.Value.name} | {apidata.Value.hash}");
+        await downloadService.AddDownloadQueue(apidata.Key, apidata.Value);
       }
+
+      var downloadList = await downloadService.GetDownloadQueue();
+
+      foreach(var download in downloadList)
+      {
+        Console.WriteLine($"{download.Url} | {download.ApiData.Name}");
+      }
+      await downloadService.StartDownload();
 
       Console.WriteLine("Hello World!");
     }

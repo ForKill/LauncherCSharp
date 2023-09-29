@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
@@ -10,7 +11,11 @@ namespace LauncherC_
 {
   public class ApiDataService
   {
+    private Config config = new Config();
+    ApiDataRoot apiDataRoot = new ApiDataRoot();
     private Dictionary<string, ApiData> apiData = new Dictionary<string, ApiData>();
+
+    private List<string> paths = new List<string>();
 
     private async Task<Dictionary<string, ApiData>> LoadingData()
     {
@@ -22,8 +27,10 @@ namespace LauncherC_
 
       foreach (var file in result.apidata)
       {
-        if (file.Value.hash.Length != 0)
+        if (file.Value.Hash.Length != 0)
           apiData.Add(file.Key, file.Value);
+        else
+          paths.Add(file.Value.Path);
       }
       return apiData;
     }
@@ -36,9 +43,26 @@ namespace LauncherC_
       return apiData;
     }
 
-    public async Task<ApiDataApp> GetVersion()
+    public async Task<List<string>> GetPaths() => paths;
+
+    public async Task<ApiDataApp> GetActualVersion() => 
+      JsonSerializer.Deserialize<ApiDataApp>(new WebClient().DownloadString(Config.AppUpdate));
+    
+    public async Task RemoveUnnecessaryFiles()
     {
-      return JsonSerializer.Deserialize<ApiDataApp>(new WebClient().DownloadString(Config.AppUpdate));
+      if (!Directory.Exists(config.FilesPath))
+        Directory.CreateDirectory(config.FilesPath);
+
+      await Task.Run(async () =>
+      {
+        foreach (var file in Directory.EnumerateFiles(config.FilesPath, "*.*", SearchOption.AllDirectories))
+        {
+          if (apiData.ContainsKey(Path.GetFileName(file)) == false)
+            File.Delete(file);
+        }
+      });
     }
+
+
   }
 }

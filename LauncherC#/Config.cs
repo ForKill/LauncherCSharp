@@ -9,9 +9,11 @@ namespace LauncherC_
 {
   public class Config
   {
-    public const string Url = "http://endless-rp.com/launcher_c_sharp/api.php?token=gjjs8j340ssad&p=";
-    public const string FilesHash = Url + "hash";
-    public const string AppUpdate = Url + "appupdate";
+    public const string Url = "http://test.criminalrussia.org/launcher_c_sharp/";
+    public const string UrlFiles = Url + "files/";
+    public const string Api = Url + "api.php?token=gjjs8j340ssad&p=";
+    public const string FilesHash = Api + "hash";
+    public const string AppUpdate = Api + "appupdate";
     public string FilesPath { get; } = AppDomain.CurrentDomain.BaseDirectory + "Education\\";
   }
 }
