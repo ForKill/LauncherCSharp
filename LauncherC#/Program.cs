@@ -34,8 +34,6 @@ namespace LauncherC_
         Console.WriteLine($"{download.Url} | {download.ApiData.Name}");
       }
       await downloadService.StartDownload();
-
-      Console.WriteLine("Hello World!");
     }
   }
 }

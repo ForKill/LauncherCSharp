@@ -1,9 +1,12 @@
-﻿namespace LauncherC_
+﻿using System;
+
+namespace LauncherC_
 {
   public class Files : ApiData
   {
-    private bool IsEx { get; set; }
+        public string WriteTimeHash { get; set; }
 
-
+    public Files(string WriteTimeHash) => this.WriteTimeHash = WriteTimeHash;
+    
   }
 }

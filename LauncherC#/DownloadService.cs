@@ -55,8 +55,13 @@ namespace LauncherC_
         using (var client = new WebClient())
         {
           DownloadEvents downloadEvents = new DownloadEvents();
-          client.DownloadProgressChanged += (sender, args) => downloadEvents.ProgressCallback(path, sender, args, stopwatch);
-          client.DownloadFileCompleted += (sender, args) => downloadEvents.ComplitedCallback(path, sender, args, stopwatch);
+
+          client.DownloadProgressChanged += (sender, args) => 
+            downloadEvents.ProgressCallback(path, sender, args, stopwatch);
+
+          client.DownloadFileCompleted += (sender, args) => 
+            downloadEvents.ComplitedCallback(path, sender, args, stopwatch);
+
           await client.DownloadFileTaskAsync(new Uri(url), path);
         }
       }

@@ -26,6 +26,9 @@ namespace LauncherC_
 
       if (asyncCompletedEventArgs.Error != null)
         Console.WriteLine($"Ошибка загрузки: {asyncCompletedEventArgs.Error.ToString()}");
+
+      FilesService filesService = new FilesService();
+       filesService.AddFile(path);
     }
   }
 }

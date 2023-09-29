@@ -1,4 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace LauncherC_
 {
@@ -8,9 +13,11 @@ namespace LauncherC_
 
     private List<Files> files = new List<Files>();
 
-    public void AddFile(Files file)
+    public async Task AddFile(string path)
     {
-
-    }
+      FileInfo fileInfo = new FileInfo(path);
+      Console.WriteLine(fileInfo.Length);
+      files.Add(new Files(Utils.GetHash(fileInfo.LastWriteTime.ToString())));
+    } 
   }
 }
