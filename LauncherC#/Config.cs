@@ -16,5 +16,25 @@ namespace LauncherC_
     public const string AppUpdate = Api + "appupdate";
     public string FilesPath { get; } = AppDomain.CurrentDomain.BaseDirectory + "Education\\";
     public string FilesSave { get; } = AppDomain.CurrentDomain.BaseDirectory + "files.json";
+
+    /// <summary>
+    /// Ширина консоли.
+    /// </summary>
+    public const int ConsoleWidth = 160;
+
+    /// <summary>
+    /// Высота консоли.
+    /// </summary>
+    public const int ConsoleHeight = 48;
+
+    /// <summary>
+    /// Стандартные цвет шрифта.
+    /// </summary>
+    public const ConsoleColor ColorFont = ConsoleColor.White;
+
+    /// <summary>
+    /// Стандартный цвет фона строки консоли.
+    /// </summary>
+    public const ConsoleColor ColorBG = ConsoleColor.Black;
   }
 }

@@ -8,65 +8,76 @@ using System.Net;
 using System.Net.Http;
 using System.Reflection.Emit;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace LauncherC_
 {
   public class DownloadService
   {
-    private Queue<Download> downloads;
     private List<Task<Download>> tasks = new List<Task<Download>>();
-    public DownloadService() => downloads = new Queue<Download>();
+    public List<Download> downloads = new List<Download>();
     private Stopwatch stopwatch = new Stopwatch();
+    FilesService filesService = new FilesService();
     Config config = new Config();
 
     public async Task AddDownloadQueue(string fullPathName, ApiData apiData)
     {
-      await Task.Run(() =>
-        downloads.Enqueue(new Download(Config.UrlFiles + fullPathName, apiData))
-      );
+      downloads.Add(new Download(Config.UrlFiles + fullPathName, apiData));
     }
 
-    public async Task<List<Download>> GetDownloadQueue() =>
-      await Task.Run(() => downloads.ToList());
+    public async Task AddDownloadQueue(ApiData apiData)
+    {
+      downloads.Add(new Download(Config.UrlFiles + apiData.Path + apiData.Name, apiData));
+    }
 
-    public async Task StartDownload()
+    public async Task<List<Download>> GetDownloadQueue() => downloads;
+
+    public async Task DownloadAllAsync()
     {
       if (downloads.Count == 0)
         return;
 
-      var download = downloads.Dequeue();
+      foreach (var download in downloads)
+      {
+        await DownloadAsync(download.Url, download.ApiData);
+        Thread.Sleep(100);
+      }
+      Lines.DeleteFromLast(Lines.InfoLineNumber + 1);
+      Lines.WriteLine("Все файлы загружены.");
+    }
 
-      string filePath = config.FilesPath + "\\" + download.ApiData.Path;
+    private async Task DownloadAsync(string url, ApiData apiData)
+    {
+      string filePath = config.FilesPath + "\\" + apiData.Path;
       if (Directory.Exists(filePath) == false)
         Directory.CreateDirectory(filePath);
 
-      stopwatch.Start();
-      await DownloadFile(download.Url, download.ApiData);
-      await StartDownload();
-    }
-
-    public async Task DownloadFile(string url, ApiData apiData)
-    {
-      try
+      using (WebClient client = new WebClient())
       {
-        string path = config.FilesPath + "\\" + apiData.Name;
-        using (var client = new WebClient())
+        client.DownloadProgressChanged += async (sender, downloadProgressChangedEventArgs) =>
         {
-          DownloadEvents downloadEvents = new DownloadEvents();
+          if (downloadProgressChangedEventArgs.ProgressPercentage > 1 && downloadProgressChangedEventArgs.ProgressPercentage < 100)
+          {
+            await Task.Delay(500);
+            Lines.WriteLine(Lines.InfoLineNumber + 1, $"Прогресс: {downloadProgressChangedEventArgs.BytesReceived} / {downloadProgressChangedEventArgs.TotalBytesToReceive} ({downloadProgressChangedEventArgs.ProgressPercentage}%)");
+            Lines.WriteLine(Lines.InfoLineNumber + 2, $"Скорость: {Utils.GetDownloadSpeed(downloadProgressChangedEventArgs.BytesReceived, stopwatch.Elapsed.TotalSeconds)}");
+          }
+         };
 
-          client.DownloadProgressChanged += async (sender, args) => 
-            downloadEvents.ProgressCallbackAsync(apiData, sender, args, stopwatch);
-
-          client.DownloadFileCompleted += async (sender, args) => 
-            downloadEvents.ComplitedCallbackAsync(apiData, sender, args, stopwatch);
-
-          await client.DownloadFileTaskAsync(new Uri(url), path);
+        string fullPath = config.FilesPath + "\\" + apiData.Name;
+        try
+        {
+          Lines.DeleteFromLast(Lines.InfoLineNumber + 1);
+          stopwatch.Start();
+          await client.DownloadFileTaskAsync(new Uri(url), fullPath);
+          stopwatch.Stop();
+          await filesService.Add(apiData);
         }
-      }
-      catch (Exception ex)
-      {
-        Console.WriteLine(ex.Message);
+        catch (WebException ex)
+        {
+          Console.WriteLine($"Ошибка загрузки файла {apiData.Name}: {ex.Message}");
+        }
       }
     }
   }

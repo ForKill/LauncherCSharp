@@ -48,21 +48,20 @@ namespace LauncherC_
     public async Task<ApiDataApp> GetActualVersion() => 
       JsonSerializer.Deserialize<ApiDataApp>(new WebClient().DownloadString(Config.AppUpdate));
     
-    public async Task RemoveUnnecessaryFiles()
+    public async Task<List<string>> GetUnnecessaryFiles()
     {
       if (!Directory.Exists(config.FilesPath))
         Directory.CreateDirectory(config.FilesPath);
 
-      await Task.Run(async () =>
+      List<string> files = new List<string>();
+
+      var enumerateFiles = Directory.EnumerateFiles(config.FilesPath, "*.*", SearchOption.AllDirectories);
+      foreach (var file in enumerateFiles)
       {
-        foreach (var file in Directory.EnumerateFiles(config.FilesPath, "*.*", SearchOption.AllDirectories))
-        {
-          if (apiData.ContainsKey(Path.GetFileName(file)) == false)
-            File.Delete(file);
-        }
-      });
+        if (apiData.ContainsKey(Path.GetFileName(file)) == false)
+          files.Add(file);
+      }
+      return files;
     }
-
-
-  }
+}
 }

@@ -13,21 +13,23 @@ namespace LauncherC_
   {
     public async Task ProgressCallbackAsync(ApiData apiData, object? sender, DownloadProgressChangedEventArgs downloadProgressChangedEventArgs, Stopwatch stopwatch)
     {
-      Console.WriteLine($"Прогресс: {downloadProgressChangedEventArgs.BytesReceived} / {downloadProgressChangedEventArgs.TotalBytesToReceive} ({downloadProgressChangedEventArgs.ProgressPercentage}%)");
-      Console.WriteLine($"Скорость: {Utils.GetDownloadSpeed(downloadProgressChangedEventArgs.BytesReceived, stopwatch.Elapsed.TotalSeconds)}");
+      Lines.DeleteFromLast(Lines.InfoLineNumber + 1);
+      Lines.WriteLine($"Прогресс: {downloadProgressChangedEventArgs.BytesReceived} / {downloadProgressChangedEventArgs.TotalBytesToReceive} ({downloadProgressChangedEventArgs.ProgressPercentage}%)");
+      Lines.WriteLine($"Скорость: {Utils.GetDownloadSpeed(downloadProgressChangedEventArgs.BytesReceived, stopwatch.Elapsed.TotalSeconds)}");
 
       await Task.Yield();
     }
 
     public async Task ComplitedCallbackAsync(ApiData apiData, object? sender, AsyncCompletedEventArgs asyncCompletedEventArgs, Stopwatch stopwatch)
     {
-      Console.WriteLine($"Загрузка завершена за {stopwatch.Elapsed.TotalSeconds}. ({apiData.Name})");
+      Lines.DeleteFromLast(Lines.InfoLineNumber + 1);
+      Lines.WriteLine($"Загрузка завершена за {stopwatch.Elapsed.TotalSeconds}. ({apiData.Name})");
 
       if (asyncCompletedEventArgs.Cancelled)
-        Console.WriteLine("Загрузка отменена.");
+        Lines.WriteLine("Загрузка отменена.");
 
       if (asyncCompletedEventArgs.Error != null)
-        Console.WriteLine($"Ошибка загрузки: {asyncCompletedEventArgs.Error.ToString()}");
+        Lines.WriteLine($"Ошибка загрузки: {asyncCompletedEventArgs.Error.ToString()}");
 
       FilesService filesService = new FilesService();
       await filesService.Add(apiData);

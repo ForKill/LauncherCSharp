@@ -32,37 +32,32 @@ namespace LauncherC_
       File.WriteAllText(config.FilesSave, json);
     }
 
-    public async Task CheckFiles()
+    public async Task<List<ApiData>> GetModifiedFiles()
     {
       if (!File.Exists(config.FilesSave))
-        return;
+        return null;
 
       List<Files> files = new List<Files>();
       string json = File.ReadAllText(config.FilesSave);
       files = JsonSerializer.Deserialize<List<Files>>(json);
 
       if (files.Count == 0)
-        return;
+        return null;
 
-      FileInfo fileInfo;
-      Files file;
-      await Task.Run(async () =>
+      List<ApiData> apiData = new List<ApiData>();
+      foreach (var fullPath in Directory.EnumerateFiles(config.FilesPath, "*.*", SearchOption.AllDirectories))
       {
-        foreach (var fullPath in Directory.EnumerateFiles(config.FilesPath, "*.*", SearchOption.AllDirectories))
-        {
-          file = files.FirstOrDefault(f => f.Path == fullPath);
-          if (file == null)
-            continue;
-          
-          fileInfo = new FileInfo(Path.GetFileName(fullPath));
-          var hash = Utils.GetHash(fileInfo.LastWriteTime.ToString());
-          if (hash != file.WriteTimeHash)
-          {
-            ApiData apiData = new ApiData(file.Name, file.Path, file.Hash, file.Size, file.Read);
-            await Add(apiData);
-          }
-        }
-      });
+        Files file = files.FirstOrDefault(f => f.Path == fullPath);
+        if (file == null)
+          continue;
+
+        FileInfo fileInfo = new FileInfo(Path.GetFileName(fullPath));
+        var hash = Utils.GetHash(fileInfo.LastWriteTime.ToString());
+        if (hash != file.WriteTimeHash)
+          apiData.Add(new ApiData(file.Name, file.Path, file.Hash, file.Size, file.Read));
+        
+      }
+      return apiData;
     }
   }
 }
