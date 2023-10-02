@@ -122,7 +122,7 @@ namespace LauncherC_
     /// Вывод текста в строку консоли с подсчетом строк.
     /// </summary>
     /// <param name="text">Текст.</param>
-    /// <returns>Возращает слудующий актуальный номер строки.</returns>
+    /// <returns>Возвращает следующий актуальный номер строки.</returns>
     public static int WriteLine(string text)
     {
       int currentLine = LineNumber;
@@ -134,9 +134,7 @@ namespace LauncherC_
     public static int WriteLine(int line, string text)
     {
       Console.SetCursorPosition(0, line);
-      Console.Write(new String(' ', Config.ConsoleWidth));
-      Console.SetCursorPosition(0, line);
-      Console.WriteLine(text);
+      Console.WriteLine(text + new String(' ', Config.ConsoleWidth - text.Length));
       if (line > LineNumber)
         LineNumber = line;
       return line;
@@ -200,6 +198,7 @@ namespace LauncherC_
         Console.WriteLine(new String(' ', Config.ConsoleWidth));
       }
       LineNumber = toLine;
+      Console.SetCursorPosition(0, 0);
       Console.SetCursorPosition(0, toLine);
       return ret;
     }

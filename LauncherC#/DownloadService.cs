@@ -18,8 +18,9 @@ namespace LauncherC_
     private List<Task<Download>> tasks = new List<Task<Download>>();
     public List<Download> downloads = new List<Download>();
     private Stopwatch stopwatch = new Stopwatch();
-    FilesService filesService = new FilesService();
-    Config config = new Config();
+    private static readonly object ConsoleLock = new object();
+    private FilesService filesService = new FilesService();
+    private Config config = new Config();
 
     public async Task AddDownloadQueue(string fullPathName, ApiData apiData)
     {
@@ -41,7 +42,6 @@ namespace LauncherC_
       foreach (var download in downloads)
       {
         await DownloadAsync(download.Url, download.ApiData);
-        Thread.Sleep(100);
       }
       Lines.DeleteFromLast(Lines.InfoLineNumber + 1);
       Lines.WriteLine("Все файлы загружены.");
@@ -57,18 +57,19 @@ namespace LauncherC_
       {
         client.DownloadProgressChanged += async (sender, downloadProgressChangedEventArgs) =>
         {
-          if (downloadProgressChangedEventArgs.ProgressPercentage > 1 && downloadProgressChangedEventArgs.ProgressPercentage < 100)
+          if (downloadProgressChangedEventArgs.ProgressPercentage > 0 && downloadProgressChangedEventArgs.ProgressPercentage < 100)
           {
-            await Task.Delay(500);
-            Lines.WriteLine(Lines.InfoLineNumber + 1, $"Прогресс: {downloadProgressChangedEventArgs.BytesReceived} / {downloadProgressChangedEventArgs.TotalBytesToReceive} ({downloadProgressChangedEventArgs.ProgressPercentage}%)");
-            Lines.WriteLine(Lines.InfoLineNumber + 2, $"Скорость: {Utils.GetDownloadSpeed(downloadProgressChangedEventArgs.BytesReceived, stopwatch.Elapsed.TotalSeconds)}");
+            lock (ConsoleLock)
+            {
+              Lines.WriteLine(Lines.InfoLineNumber + 1, $"Прогресс: {downloadProgressChangedEventArgs.BytesReceived} / {downloadProgressChangedEventArgs.TotalBytesToReceive} ({downloadProgressChangedEventArgs.ProgressPercentage}%)");
+              Lines.Write($"Скорость: {Utils.GetDownloadSpeed(downloadProgressChangedEventArgs.BytesReceived, stopwatch.Elapsed.TotalSeconds)}");
+            }
           }
          };
 
         string fullPath = config.FilesPath + "\\" + apiData.Name;
         try
         {
-          Lines.DeleteFromLast(Lines.InfoLineNumber + 1);
           stopwatch.Start();
           await client.DownloadFileTaskAsync(new Uri(url), fullPath);
           stopwatch.Stop();

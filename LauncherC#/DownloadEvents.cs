@@ -11,13 +11,14 @@ namespace LauncherC_
 {
   public class DownloadEvents
   {
+    private static readonly object ConsoleLock = new object();
     public async Task ProgressCallbackAsync(ApiData apiData, object? sender, DownloadProgressChangedEventArgs downloadProgressChangedEventArgs, Stopwatch stopwatch)
     {
-      Lines.DeleteFromLast(Lines.InfoLineNumber + 1);
-      Lines.WriteLine($"Прогресс: {downloadProgressChangedEventArgs.BytesReceived} / {downloadProgressChangedEventArgs.TotalBytesToReceive} ({downloadProgressChangedEventArgs.ProgressPercentage}%)");
-      Lines.WriteLine($"Скорость: {Utils.GetDownloadSpeed(downloadProgressChangedEventArgs.BytesReceived, stopwatch.Elapsed.TotalSeconds)}");
-
-      await Task.Yield();
+      lock (ConsoleLock)
+      {
+        Lines.WriteLine(Lines.InfoLineNumber + 1, $"Прогресс: {downloadProgressChangedEventArgs.BytesReceived} / {downloadProgressChangedEventArgs.TotalBytesToReceive} ({downloadProgressChangedEventArgs.ProgressPercentage}%)");
+        Lines.Write($"Скорость: {Utils.GetDownloadSpeed(downloadProgressChangedEventArgs.BytesReceived, stopwatch.Elapsed.TotalSeconds)}");
+      }
     }
 
     public async Task ComplitedCallbackAsync(ApiData apiData, object? sender, AsyncCompletedEventArgs asyncCompletedEventArgs, Stopwatch stopwatch)
