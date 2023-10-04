@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-
+/*
+ * 
+      // benchmarkdotnet
+ * 
+ * */
 namespace LauncherC_
 {
   internal class Program
@@ -39,7 +43,6 @@ namespace LauncherC_
           Lines.WriteLineInfo(Lines.VersionLineNumber, $"Сборка: v.{apiVersion.Version} | HASH:{apiVersion.Hash} | (Требуется проверка)");
         }
       });
-
       var task = timer.Start();
 
       ConsoleKeyInfo KeyInfo;
@@ -76,7 +79,12 @@ namespace LauncherC_
 
                   foreach (var apidata in apiData)
                   {
-                    if(File.Exists(apidata.Key) && )
+                    if(File.Exists(apidata.Key))
+                    { 
+                      Files data = await filesService.GetFileData(apidata.Key);
+                      if (data != null && data.Size ==  apidata.Value.Size)
+                        continue;
+                    }
                     await downloadService.AddDownloadQueue(apidata.Key, apidata.Value);
                     Lines.WriteLine($"Файл \"{apidata.Key}\" добавлен в очередь на скачивание.");
                   }

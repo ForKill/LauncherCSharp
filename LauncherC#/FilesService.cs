@@ -59,8 +59,8 @@ namespace LauncherC_
       }
       return apiData;
     }
-    /*
-    public async Task<int> GetFileSize(string fullPath)
+    
+    public async Task<Files> GetFileData(string fullPath)
     {
       if (!File.Exists(config.FilesSave))
         return null;
@@ -74,9 +74,9 @@ namespace LauncherC_
 
       Files file = files.FirstOrDefault(f => f.Path == fullPath);
       if (file == null)
-        continue;
+        return null;
 
-      return
-    }*/
+      return file;
+    }
   }
 }
