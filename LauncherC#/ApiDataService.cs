@@ -10,7 +10,6 @@ namespace LauncherC_
   public class ApiDataService
   {
     private Config config = new Config();
-    ApiDataRoot apiDataRoot = new ApiDataRoot();
     private Dictionary<string, ApiData> apiData = new Dictionary<string, ApiData>();
 
     private List<string> paths = new List<string>();

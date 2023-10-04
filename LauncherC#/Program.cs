@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 /*
  * 
@@ -24,7 +25,7 @@ namespace LauncherC_
       FilesService filesService = new FilesService();
 
       apiVersion = await apiDataService.GetActualVersion();
-      Lines.VersionLineNumber = Lines.WriteLineInfo($"Сборка: v.{apiVersion.Version} | HASH:{apiVersion.Hash} | (Требуется проверка)");
+      Lines.VersionLineNumber = Lines.WriteLineInfo($"Сборка: v{apiVersion.Version} | HASH:{apiVersion.Hash}");
       Lines.WriteLineInfo(" 1 - Выполнить полную проверку файлов.");
       Lines.WriteLineInfo(" 2 - Просмотреть очередь на скачивание.");
       Lines.WriteLineInfo(" 3 - Начать загрузку файлов.");
@@ -40,7 +41,7 @@ namespace LauncherC_
         if (version.Hash != apiVersion.Hash)
         {
           Lines.ShowInfo($"Сборка файлов обновлена", ConsoleColor.Yellow);
-          Lines.WriteLineInfo(Lines.VersionLineNumber, $"Сборка: v.{apiVersion.Version} | HASH:{apiVersion.Hash} | (Требуется проверка)");
+          Lines.WriteLineInfo(Lines.VersionLineNumber, $"Сборка: v{apiVersion.Version} | HASH:{apiVersion.Hash}");
         }
       });
       var task = timer.Start();
@@ -48,7 +49,6 @@ namespace LauncherC_
       ConsoleKeyInfo KeyInfo;
       do
       {
-
         KeyInfo = Console.ReadKey(true);
         if (Lines.ErrorTimerEnabled == false)
         {
@@ -65,29 +65,39 @@ namespace LauncherC_
                 if(apiData.Count == 0)
                 {
                   Lines.ShowErrorInfo("Данных API нет.");
+                  break;
                 }
-                else
+
+                var uFiles = await apiDataService.GetUnnecessaryFiles();
+
+                foreach (var file in uFiles)
                 {
-                  await downloadService.Clear();
-                  var files = await apiDataService.GetUnnecessaryFiles();
+                  File.Delete(file);
+                  Lines.WriteLine($"Файл \"{file}\" удален.");
+                }
 
-                  foreach (var file in files)
-                  {
-                    File.Delete(file);
-                    Lines.WriteLine($"Файл \"{file}\" удален.");
-                  }
+                List<ApiData> apiDataValues = apiData.Values.ToList();
+                var uData = await filesService.GetUnnecessaryData(apiDataValues);
 
-                  foreach (var apidata in apiData)
-                  {
-                    if(File.Exists(apidata.Key))
-                    { 
-                      Files data = await filesService.GetFileData(apidata.Key);
-                      if (data != null && data.Size ==  apidata.Value.Size)
-                        continue;
-                    }
-                    await downloadService.AddDownloadQueue(apidata.Key, apidata.Value);
-                    Lines.WriteLine($"Файл \"{apidata.Key}\" добавлен в очередь на скачивание.");
+                foreach (var file in uData)
+                {
+                  string filePath = file.Path + "\\" + file.Name;
+                  File.Delete(filePath);
+                  Lines.WriteLine($"Файл \"{filePath}\" удален.");
+                }
+
+
+                await downloadService.Clear();
+                foreach (var apidata in apiData)
+                {
+                  if(File.Exists(apidata.Key))
+                  { 
+                    Files data = await filesService.GetFileData(apidata.Key);
+                    if (data != null && data.Size == apidata.Value.Size)
+                      continue;
                   }
+                  await downloadService.AddDownloadQueue(apidata.Key, apidata.Value);
+                  Lines.WriteLine($"Файл \"{apidata.Key}\" добавлен в очередь на скачивание.");
                 }
                 break;
               }

@@ -59,7 +59,26 @@ namespace LauncherC_
       }
       return apiData;
     }
-    
+
+    public async Task<List<Files>> GetUnnecessaryData(List<ApiData> apiData)
+    {
+      if (!File.Exists(config.FilesSave))
+        return null;
+
+      List<Files> files = new List<Files>();
+      string json = File.ReadAllText(config.FilesSave);
+      files = JsonSerializer.Deserialize<List<Files>>(json);
+
+      List<Files> filesCopy = files.ToList();
+      foreach (var file in filesCopy)
+      {
+        if(apiData.FirstOrDefault(f => f.Hash == file.Hash && f.Name == file.Name && f.Path == file.Path) != null)
+          files.Remove(file);
+      }
+      return files;
+    }
+
+
     public async Task<Files> GetFileData(string fullPath)
     {
       if (!File.Exists(config.FilesSave))
