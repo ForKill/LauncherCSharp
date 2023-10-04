@@ -30,6 +30,11 @@ namespace LauncherC_
     public static int VersionLineNumber;
 
     /// <summary>
+    /// Строка загрузки.
+    /// </summary>
+    public static int DownloadLineNumber;
+
+    /// <summary>
     /// Текст ошибки
     /// </summary>
     private static string ErrorInfoText = string.Empty;
@@ -134,9 +139,7 @@ namespace LauncherC_
     public static int WriteLine(int line, string text)
     {
       Console.SetCursorPosition(0, line);
-      Console.WriteLine(text + new String(' ', Config.ConsoleWidth - text.Length));
-      if (line > LineNumber)
-        LineNumber = line;
+      Console.Write(text + new String(' ', Config.ConsoleWidth - text.Length));
       return line;
     }
 
@@ -182,6 +185,23 @@ namespace LauncherC_
 
       LineNumber++;
       return LineNumber;
+    }
+
+    public static int WriteLineInfo(int line, string text, int FillLine = Config.ConsoleWidth)
+    {
+      Console.BackgroundColor = ConsoleColor.White;
+      Console.ForegroundColor = ConsoleColor.Black;
+
+      int size = text.Length;
+      Console.SetCursorPosition(0, line);
+      if (size > FillLine)
+        Console.Write(text);
+      else
+        Console.Write(text + new String(' ', FillLine - size));
+
+      SetDefaultColor();
+
+      return line;
     }
 
     /// <summary>

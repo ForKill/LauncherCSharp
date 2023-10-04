@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace LauncherC_
 {
   internal class Program
   {
+    private static ApiDataApp apiVersion;
     static async Task Main(string[] args)
     {
-      Console.Title = "PhoneBook";
+      Console.Title = "LauncherCSharp";
       Console.WindowWidth = Config.ConsoleWidth;
       Console.WindowHeight = Config.ConsoleHeight;
       Console.OutputEncoding = System.Text.Encoding.Default;
@@ -19,10 +19,8 @@ namespace LauncherC_
       DownloadService downloadService = new DownloadService();
       FilesService filesService = new FilesService();
 
-      var apiVersion = await apiDataService.GetActualVersion();
-      Console.WriteLine($"{apiVersion.Hash} | {apiVersion.Version}");
+      apiVersion = await apiDataService.GetActualVersion();
       Lines.VersionLineNumber = Lines.WriteLineInfo($"Сборка: v.{apiVersion.Version} | HASH:{apiVersion.Hash} | (Требуется проверка)");
-
       Lines.WriteLineInfo(" 1 - Выполнить полную проверку файлов.");
       Lines.WriteLineInfo(" 2 - Просмотреть очередь на скачивание.");
       Lines.WriteLineInfo(" 3 - Начать загрузку файлов.");
@@ -32,9 +30,22 @@ namespace LauncherC_
     
       Lines.SetDefaultColor();
 
+      var timer = new Timers(async () =>
+      {
+        ApiDataApp version = await apiDataService.GetActualVersion();
+        if (version.Hash != apiVersion.Hash)
+        {
+          Lines.ShowInfo($"Сборка файлов обновлена", ConsoleColor.Yellow);
+          Lines.WriteLineInfo(Lines.VersionLineNumber, $"Сборка: v.{apiVersion.Version} | HASH:{apiVersion.Hash} | (Требуется проверка)");
+        }
+      });
+
+      var task = timer.Start();
+
       ConsoleKeyInfo KeyInfo;
       do
       {
+
         KeyInfo = Console.ReadKey(true);
         if (Lines.ErrorTimerEnabled == false)
         {
@@ -45,6 +56,7 @@ namespace LauncherC_
               {
                 Lines.DeleteFromLast(Lines.InfoLineNumber + 1);
                 Lines.ShowInfo($"Получаем API списка файлов.", ConsoleColor.Gray);
+
                 Dictionary<string, ApiData> apiData = await apiDataService.GetData();
 
                 if(apiData.Count == 0)
@@ -53,8 +65,7 @@ namespace LauncherC_
                 }
                 else
                 {
-                  Lines.ShowInfo($"API получен, удаляем получаем и удаляем лишние файлы в папке если они существуют.", ConsoleColor.Gray);
-
+                  await downloadService.Clear();
                   var files = await apiDataService.GetUnnecessaryFiles();
 
                   foreach (var file in files)
@@ -63,9 +74,9 @@ namespace LauncherC_
                     Lines.WriteLine($"Файл \"{file}\" удален.");
                   }
 
-                  Lines.ShowInfo($"Удаление завершено, добавляем файлы для скачивания в очередь.", ConsoleColor.Gray);
                   foreach (var apidata in apiData)
                   {
+                    if(File.Exists(apidata.Key) && )
                     await downloadService.AddDownloadQueue(apidata.Key, apidata.Value);
                     Lines.WriteLine($"Файл \"{apidata.Key}\" добавлен в очередь на скачивание.");
                   }
@@ -112,6 +123,9 @@ namespace LauncherC_
           }
         }
       } while (KeyInfo.Key != ConsoleKey.Escape);
+
+      timer.Stop();
+      task.Wait();
     }
   }
 }

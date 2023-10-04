@@ -59,5 +59,24 @@ namespace LauncherC_
       }
       return apiData;
     }
+    /*
+    public async Task<int> GetFileSize(string fullPath)
+    {
+      if (!File.Exists(config.FilesSave))
+        return null;
+
+      List<Files> files = new List<Files>();
+      string json = File.ReadAllText(config.FilesSave);
+      files = JsonSerializer.Deserialize<List<Files>>(json);
+
+      if (files.Count == 0)
+        return null;
+
+      Files file = files.FirstOrDefault(f => f.Path == fullPath);
+      if (file == null)
+        continue;
+
+      return
+    }*/
   }
 }

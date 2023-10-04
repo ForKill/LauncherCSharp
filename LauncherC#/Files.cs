@@ -1,8 +1,4 @@
-﻿using System;
-using System.Text.Json.Serialization;
-using System.Threading;
-
-namespace LauncherC_
+﻿namespace LauncherC_
 {
   public class Files : ApiData
   {
