@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace LauncherC_
 {
@@ -11,8 +13,6 @@ namespace LauncherC_
   {
     private Config config = new Config();
     private Dictionary<string, ApiData> apiData = new Dictionary<string, ApiData>();
-
-    private List<string> paths = new List<string>();
 
     private async Task<Dictionary<string, ApiData>> LoadingData()
     {
@@ -26,8 +26,6 @@ namespace LauncherC_
       {
         if (file.Value.Hash.Length != 0)
           apiData.Add(file.Key, file.Value);
-        else
-          paths.Add(file.Value.Path);
       }
       return apiData;
     }
@@ -39,8 +37,6 @@ namespace LauncherC_
 
       return apiData;
     }
-
-    public async Task<List<string>> GetPaths() => paths;
 
     public async Task<ApiDataApp> GetActualVersion() => 
       JsonSerializer.Deserialize<ApiDataApp>(new WebClient().DownloadString(Config.AppUpdate));
@@ -55,7 +51,7 @@ namespace LauncherC_
       var enumerateFiles = Directory.EnumerateFiles(config.FilesPath, "*.*", SearchOption.AllDirectories);
       foreach (var file in enumerateFiles)
       {
-        if (apiData.ContainsKey(Path.GetFileName(file)) == false)
+        if (apiData.ContainsKey(file.Replace(config.FilesPath, "")) == false)
           files.Add(file);
       }
       return files;

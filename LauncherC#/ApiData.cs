@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 namespace LauncherC_
 {
   public class ApiData
@@ -7,18 +8,26 @@ namespace LauncherC_
     public string Path { get; set; }
     public string Hash { get; set; }
     public long Size { get; set; }
-    public bool Read { get; set; }
 
     public ApiData() { }
 
-    public ApiData(string name, string path, string hash, long size, bool read) 
+    public ApiData(string name, string path, string hash, long size) 
     {
       Name = name;
       Path = path;
       Hash = hash;
       Size = size;
-      Read = read;
     }
+
+    public override bool Equals(object obj)
+    {
+      if (obj is ApiData other)
+        return this.Name == other.Name && this.Path == other.Path && this.Hash == other.Hash && this.Size == other.Size;
+      return false;
+    }
+
+    public override int GetHashCode() => HashCode.Combine(Name, Path, Hash, Size);
+
   }
 
   public class ApiDataRoot

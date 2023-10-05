@@ -58,7 +58,7 @@ namespace LauncherC_
         client.DownloadProgressChanged += async (sender, args) =>
           downloadEvents.ProgressCallbackAsync(sender, args);
 
-        string fullPath = config.FilesPath + "\\" + apiData.Name;
+        string fullPath = filePath + "\\" + apiData.Name;
         try
         {
           if(Lines.DownloadLineNumber == 0)
@@ -68,7 +68,7 @@ namespace LauncherC_
 
           await client.DownloadFileTaskAsync(new Uri(url), fullPath);
           
-          await filesService.Add(apiData);
+          await filesService.Add(apiData.Path + apiData.Name);
         }
         catch (WebException ex)
         {

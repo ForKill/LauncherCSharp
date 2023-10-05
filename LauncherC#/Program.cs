@@ -76,26 +76,29 @@ namespace LauncherC_
                   Lines.WriteLine($"Файл \"{file}\" удален.");
                 }
 
-                List<ApiData> apiDataValues = apiData.Values.ToList();
-                var uData = await filesService.GetUnnecessaryData(apiDataValues);
+                var jFiles = await filesService.GetFiles();
 
-                foreach (var file in uData)
+                if(jFiles != null)
                 {
-                  string filePath = file.Path + "\\" + file.Name;
-                  File.Delete(filePath);
-                  Lines.WriteLine($"Файл \"{filePath}\" удален.");
+                  foreach(var file in jFiles)
+                  {
+                    if(!apiData.Keys.Contains(file.Path))
+                    {
+                      await filesService.Delete(file);
+                    }
+                  }
                 }
 
 
                 await downloadService.Clear();
                 foreach (var apidata in apiData)
                 {
-                  if(File.Exists(apidata.Key))
+                  /*if(File.Exists(apidata.Key))
                   { 
                     Files data = await filesService.GetFileData(apidata.Key);
                     if (data != null && data.Size == apidata.Value.Size)
                       continue;
-                  }
+                  }*/
                   await downloadService.AddDownloadQueue(apidata.Key, apidata.Value);
                   Lines.WriteLine($"Файл \"{apidata.Key}\" добавлен в очередь на скачивание.");
                 }
@@ -115,17 +118,6 @@ namespace LauncherC_
               {
                 Lines.DeleteFromLast(Lines.InfoLineNumber + 1);
                 await downloadService.DownloadAllAsync();
-                break;
-              }
-            case 52:
-              {
-                Lines.DeleteFromLast(Lines.InfoLineNumber + 1);
-                var modifiedFiles = await filesService.GetModifiedFiles();
-                foreach (var modifiedFile in modifiedFiles)
-                {
-                  await downloadService.AddDownloadQueue(modifiedFile);
-                  Lines.WriteLine($"Файл \"{modifiedFile.Name}\\\\{modifiedFile.Name}\" изменен, требуется обновление.");
-                }
                 break;
               }
             case 46:

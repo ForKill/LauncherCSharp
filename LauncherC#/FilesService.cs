@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -14,9 +10,9 @@ namespace LauncherC_
   {
     private Config config = new Config();
 
-    public async Task Add(ApiData apiData)
+    public async Task Add(string fullPathName)
     {
-      string path = config.FilesPath + "\\" + apiData.Name;
+      string path = config.FilesPath + "\\" + fullPathName;
       FileInfo fileInfo = new FileInfo(path);
 
       string json;
@@ -26,76 +22,39 @@ namespace LauncherC_
         json = File.ReadAllText(config.FilesSave);
         files = JsonSerializer.Deserialize<List<Files>>(json);
       }
-
-      files.Add(new Files(Utils.GetHash(fileInfo.LastWriteTime.ToString()), apiData));
+      files.Add(new Files(fullPathName, Utils.GetHash(fileInfo.LastWriteTime.ToString())));
       json = JsonSerializer.Serialize(files);
       File.WriteAllText(config.FilesSave, json);
     }
 
-    public async Task<List<ApiData>> GetModifiedFiles()
+    public async Task Delete(Files file)
     {
-      if (!File.Exists(config.FilesSave))
-        return null;
-
+      string json;
       List<Files> files = new List<Files>();
-      string json = File.ReadAllText(config.FilesSave);
-      files = JsonSerializer.Deserialize<List<Files>>(json);
-
-      if (files.Count == 0)
-        return null;
-
-      List<ApiData> apiData = new List<ApiData>();
-      foreach (var fullPath in Directory.EnumerateFiles(config.FilesPath, "*.*", SearchOption.AllDirectories))
+      if (File.Exists(config.FilesSave))
       {
-        Files file = files.FirstOrDefault(f => f.Path == fullPath);
-        if (file == null)
-          continue;
-
-        FileInfo fileInfo = new FileInfo(Path.GetFileName(fullPath));
-        var hash = Utils.GetHash(fileInfo.LastWriteTime.ToString());
-        if (hash != file.WriteTimeHash)
-          apiData.Add(new ApiData(file.Name, file.Path, file.Hash, file.Size, file.Read));
-        
+        json = File.ReadAllText(config.FilesSave);
+        files = JsonSerializer.Deserialize<List<Files>>(json);
       }
-      return apiData;
+      
+      if(!files.Remove(file))
+      {
+        Lines.ShowErrorInfo("Ошибка удаления.");
+      }
+      json = JsonSerializer.Serialize(files);
+      File.WriteAllText(config.FilesSave, json);
     }
 
-    public async Task<List<Files>> GetUnnecessaryData(List<ApiData> apiData)
+    public async Task<List<Files>> GetFiles()
     {
+      string json;
       if (!File.Exists(config.FilesSave))
         return null;
 
       List<Files> files = new List<Files>();
-      string json = File.ReadAllText(config.FilesSave);
+      json = File.ReadAllText(config.FilesSave);
       files = JsonSerializer.Deserialize<List<Files>>(json);
-
-      List<Files> filesCopy = files.ToList();
-      foreach (var file in filesCopy)
-      {
-        if(apiData.FirstOrDefault(f => f.Hash == file.Hash && f.Name == file.Name && f.Path == file.Path) != null)
-          files.Remove(file);
-      }
       return files;
-    }
-
-
-    public async Task<Files> GetFileData(string fullPath)
-    {
-      if (!File.Exists(config.FilesSave))
-        return null;
-
-      List<Files> files = new List<Files>();
-      string json = File.ReadAllText(config.FilesSave);
-      files = JsonSerializer.Deserialize<List<Files>>(json);
-
-      if (files.Count == 0)
-        return null;
-
-      Files file = files.FirstOrDefault(f => f.Path == fullPath);
-      if (file == null)
-        return null;
-
-      return file;
     }
   }
 }

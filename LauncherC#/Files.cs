@@ -1,15 +1,29 @@
-﻿namespace LauncherC_
+﻿using System;
+using System.Collections.Generic;
+
+namespace LauncherC_
 {
-  public class Files : ApiData
+  public class Files
   {
     public string WriteTimeHash { get; set; }
+    public string Path { get; set; }
 
-    public Files() { }
-
-    public Files(string WriteTimeHash, ApiData apiData)
-      : base(apiData.Name, apiData.Path, apiData.Hash, apiData.Size, apiData.Read)
+    public Files(string path, string writetimehash)
     {
-      this.WriteTimeHash = WriteTimeHash;
+      Path = path;
+      WriteTimeHash = writetimehash;
+    }
+
+    public override bool Equals(object obj)
+    {
+      if (obj is Files other)
+        return this.Path == other.Path && this.WriteTimeHash == other.WriteTimeHash;
+      return false;
+    }
+
+    public override int GetHashCode()
+    {
+      return HashCode.Combine(Path, WriteTimeHash);
     }
   }
 }
