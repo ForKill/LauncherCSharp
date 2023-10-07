@@ -89,6 +89,7 @@ namespace LauncherC_
             case 49:
               {
                 await filesManager.CheckingForDownload(apiDataService, filesService, downloadService);
+                filesManager.DownloadAll(false);
                 break;
               }
             case 50:

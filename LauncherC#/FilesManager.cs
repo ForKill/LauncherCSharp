@@ -38,7 +38,8 @@ namespace LauncherC_
     /// </summary>
     /// <param name="apiDataService">Сущность данных API сервиса.</param>
     /// <param name="filesService">Сущность данных файлового сервиса.</param>
-    /// <param name="downloadService">Сущность данных сервиса загрузки.</param>
+    /// <param name="downloadService">Сущ</param>
+    /// <returns></returns>
     public async Task CheckingForDownload(ApiDataService apiDataService, FilesService filesService, DownloadService downloadService)
     {
       Lines.DeleteFromLast(Lines.InfoLineNumber + 1);
