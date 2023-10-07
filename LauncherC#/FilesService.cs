@@ -1,16 +1,26 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace LauncherC_
 {
+  /// <summary>
+  /// Сервис работы с files.json
+  /// </summary>
   internal class FilesService
   {
+    /// <summary>
+    /// Экземпляр конфигураций.
+    /// </summary>
     private Config config = new Config();
 
+    /// <summary>
+    /// Добавить данные в files.json
+    /// </summary>
+    /// <param name="path">Полный путь.</param>
+    /// <param name="hash">Хэш файла.</param>
     public async Task Add(string path, string hash)
     {
       string fullPathName = config.FilesPath + "\\" + path;
@@ -28,6 +38,10 @@ namespace LauncherC_
       File.WriteAllText(config.FilesSave, json);
     }
 
+    /// <summary>
+    /// Удалить из files.json
+    /// </summary>
+    /// <param name="file">Сущность файла.</param>
     public async Task Delete(Files file)
     {
       if (!File.Exists(config.FilesSave))
@@ -43,6 +57,10 @@ namespace LauncherC_
       File.WriteAllText(config.FilesSave, json);
     }
 
+    /// <summary>
+    /// Удалить из files.json
+    /// </summary>
+    /// <param name="path">Путь файла/Ключ API</param>
     public async Task Delete(string path)
     {
       if (!File.Exists(config.FilesSave))
@@ -61,6 +79,10 @@ namespace LauncherC_
       File.WriteAllText(config.FilesSave, json);
     }
 
+    /// <summary>
+    /// Список файлов в files.json
+    /// </summary>
+    /// <returns>Список файлов.</returns>
     public async Task<List<Files>> GetFiles()
     {
       if (!File.Exists(config.FilesSave))
@@ -71,6 +93,11 @@ namespace LauncherC_
       return files;
     }
 
+    /// <summary>
+    /// Обновить данные файла в files.json
+    /// </summary>
+    /// <param name="path">Путь до файла.</param>
+    /// <param name="hash">Хэш файла.</param>
     public async Task Update(string path, string hash)
     {
       if (!File.Exists(config.FilesSave))
@@ -97,6 +124,9 @@ namespace LauncherC_
       File.WriteAllText(config.FilesSave, json);
     }
 
+    /// <summary>
+    /// Очистить и удалить files.json
+    /// </summary>
     public void Clear()
     {
       if (!File.Exists(config.FilesSave))

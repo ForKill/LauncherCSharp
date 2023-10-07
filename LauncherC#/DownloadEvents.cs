@@ -1,14 +1,26 @@
-﻿using System.Diagnostics;
-using System.Net;
+﻿using System.Net;
 using System.Threading.Tasks;
 
 namespace LauncherC_
 {
+  /// <summary>
+  /// События загрузки.
+  /// </summary>
   public class DownloadEvents
   {
+    /// <summary>
+    /// Потокобезопасность.
+    /// </summary>
     private static readonly object ConsoleLock = new object();
+
+    /// <summary>
+    /// Последние данные байтов.
+    /// </summary>
     private long lastRecorded;
 
+    /// <summary>
+    /// Событие скачивания файла.
+    /// </summary>
     public async Task ProgressCallbackAsync(object? sender, DownloadProgressChangedEventArgs downloadProgressChangedEventArgs)
     {
       lock (ConsoleLock)

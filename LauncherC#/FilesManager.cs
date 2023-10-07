@@ -6,16 +6,39 @@ using System.Linq;
 
 namespace LauncherC_
 {
+  /// <summary>
+  /// Работа с сервисами.
+  /// </summary>
   internal class FilesManager
   {
+    /// <summary>
+    /// Экземпляр конфигураций.
+    /// </summary>
     Config config = new Config();
 
+    /// <summary>
+    /// Скачать ли принудительно все заново.
+    /// </summary>
     private bool downloadAll = false;
 
+    /// <summary>
+    /// Установка значения для скачивания без проверок.
+    /// </summary>
+    /// <param name="status">true/false</param>
     public void DownloadAll(bool status) => downloadAll = status;
 
+    /// <summary>
+    /// Статус для скачивания без проверок.
+    /// </summary>
+    /// <returns>true/false</returns>
     public bool DownloadAll() => downloadAll;
 
+    /// <summary>
+    /// Полный процесс проверки файлов.
+    /// </summary>
+    /// <param name="apiDataService">Сущность данных API сервиса.</param>
+    /// <param name="filesService">Сущность данных файлового сервиса.</param>
+    /// <param name="downloadService">Сущность данных сервиса загрузки.</param>
     public async Task CheckingForDownload(ApiDataService apiDataService, FilesService filesService, DownloadService downloadService)
     {
       Lines.DeleteFromLast(Lines.InfoLineNumber + 1);

@@ -8,14 +8,35 @@ using System.Threading.Tasks;
 
 namespace LauncherC_
 {
+  /// <summary>
+  /// Сервис для работы с данными API.
+  /// </summary>
   public class ApiDataService
   {
-    public static ApiDataApp apiVersion = new ApiDataApp();
-
-    private Config config = new Config();
-    private Dictionary<string, ApiData> apiData = new Dictionary<string, ApiData>();
+    /// <summary>
+    /// Обработчик событий обновления версии сборки.
+    /// </summary>
     public event EventHandler VersionCompleted;
 
+    /// <summary>
+    /// Экземляр работы с версией сборки API.
+    /// </summary>
+    public static ApiDataApp apiVersion = new ApiDataApp();
+
+    /// <summary>
+    /// Экземпляр конфигураций.
+    /// </summary>
+    private Config config = new Config();
+    
+    /// <summary>
+    /// Экземпляр работы с файлами API и ключем.
+    /// </summary>
+    private Dictionary<string, ApiData> apiData = new Dictionary<string, ApiData>();
+
+    /// <summary>
+    /// Загрузка данных из API.
+    /// </summary>
+    /// <returns></returns>
     private async Task<Dictionary<string, ApiData>> LoadingData()
     {
       HttpClient client = new HttpClient();
@@ -32,6 +53,10 @@ namespace LauncherC_
       return apiData;
     }
 
+    /// <summary>
+    /// Получить данные API.
+    /// </summary>
+    /// <returns>Возвращает список сущности файлов с ключом из API.</returns>
     public async Task<Dictionary<string, ApiData>> GetData()
     {
       if (apiData.Count == 0)
@@ -39,11 +64,22 @@ namespace LauncherC_
       return apiData;
     }
 
+    /// <summary>
+    /// Очистка API файлов.
+    /// </summary>
     public void ClearData() => apiData.Clear();
 
+    /// <summary>
+    /// Актуальные данные версии сборки с сайта API.
+    /// </summary>
+    /// <returns>Сущность актуальных данных сборки API.</returns>
     public async Task<ApiDataApp> GetActualVersionAPI() => 
       JsonSerializer.Deserialize<ApiDataApp>(new WebClient().DownloadString(Config.AppUpdate));
 
+    /// <summary>
+    /// Актуальные данные сборки из локального файла.
+    /// </summary>
+    /// <returns></returns>
     public async Task<ApiDataApp> GetActualVersion()
     {
       if (!File.Exists(config.VersionSave))
@@ -54,6 +90,13 @@ namespace LauncherC_
       return apidataapp;
     }
 
+    /// <summary>
+    /// Установка актуальных данных сборки API в память.
+    /// </summary>
+    /// <param name="acticalVersion">Сущность актуальной сборки.</param>
+    /// <param name="apiDataService">Сущность сервиса API.</param>
+    /// <param name="callback">Калбэк с актуальными данными.</param>
+    /// <returns></returns>
     public async Task SetVersion(ApiDataApp acticalVersion, ApiDataService apiDataService = null, Action<ApiDataApp, ApiDataService> callback = null)
     {
       apiVersion = acticalVersion;
@@ -62,8 +105,16 @@ namespace LauncherC_
       callback?.Invoke(acticalVersion, apiDataService);
     }
 
+    /// <summary>
+    /// Данные версии API в памяти.
+    /// </summary>
+    /// <returns>Сущность с данными версии сборки.</returns>
     public ApiDataApp GetVersion() => apiVersion;
 
+    /// <summary>
+    /// Вывести не аутальные данные в files.json
+    /// </summary>
+    /// <returns>Список неактуальных файлов.</returns>
     public async Task<List<string>> GetUnnecessaryFiles()
     {
       if (!Directory.Exists(config.FilesPath))

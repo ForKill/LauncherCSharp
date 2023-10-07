@@ -1,15 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Net;
 using System.Security.Cryptography;
 
 namespace LauncherC_
 {
+  /// <summary>
+  /// Полезные методы.
+  /// </summary>
   public static class Utils
   {
+    /// <summary>
+    /// Хэш строки.
+    /// </summary>
+    /// <param name="input">Текст.</param>
+    /// <returns>Хэш.</returns>
     public static string GetStringHash(string input)
     {
       using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
@@ -21,6 +25,11 @@ namespace LauncherC_
       }
     }
 
+    /// <summary>
+    /// Конвертация скорости скачивания.
+    /// </summary>
+    /// <param name="byteCount">Байты.</param>
+    /// <returns>Формат скорости.</returns>
     public static string HumanizeByteSize(this long byteCount)
     {
       string[] suf = { "B", "KB", "MB", "GB", "TB", "PB", "EB" }; //Longs run out around EB
@@ -40,6 +49,11 @@ namespace LauncherC_
       return HumanizeByteSize((long)byteCount);
     }
 
+    /// <summary>
+    /// Вычисление хэша файла.
+    /// </summary>
+    /// <param name="filename">Путь к файлу.</param>
+    /// <returns></returns>
     public static string CalculateMD5(string filename)
     {
       try

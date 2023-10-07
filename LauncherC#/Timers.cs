@@ -4,32 +4,63 @@ using System.Threading.Tasks;
 
 namespace LauncherC_
 {
+  /// <summary>
+  /// Таймер.
+  /// </summary>
   internal class Timers
   {
+    /// <summary>
+    /// Событие таймера.
+    /// </summary>
     private Action callback;
-    private int interval;
+
+    /// <summary>
+    /// Интервал.
+    /// </summary>
+    private int Interval;
+
+    /// <summary>
+    /// Сущность таймера.
+    /// </summary>
     private Timer timer;
+
     private CancellationTokenSource cancellationTokenSource;
 
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="callback">Обработчик события.</param>
+    /// <param name="interval">Интервал таймера.</param>
     public Timers(Action callback, int interval = 5000)
     {
       this.callback = callback;
-      this.interval = interval;
+      Interval = interval;
       cancellationTokenSource = new CancellationTokenSource();
     }
 
+    /// <summary>
+    /// Запуск таймера.
+    /// </summary>
+    /// <returns></returns>
     public async Task Start()
     {
-      timer = new Timer(async state => await Callback(), null, 0, interval);
+      timer = new Timer(async state => await Callback(), null, 0, Interval);
       await Task.Delay(Timeout.Infinite, cancellationTokenSource.Token);
     }
 
+    /// <summary>
+    /// Остановка таймера.
+    /// </summary>
     public void Stop()
     {
       cancellationTokenSource.Cancel();
       timer?.Dispose();
     }
 
+    /// <summary>
+    /// Событие.
+    /// </summary>
+    /// <returns></returns>
     private async Task Callback()
     {
       try

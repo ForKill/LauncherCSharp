@@ -136,6 +136,12 @@ namespace LauncherC_
       return currentLine;
     }
 
+    /// <summary>
+    /// Вывод текста в строку консоли с подсчетом строк.
+    /// </summary>
+    /// <param name="line">Строка в которой вывести.</param>
+    /// <param name="text">Текст.</param>
+    /// <returns>Указанная строка</returns>
     public static int WriteLine(int line, string text)
     {
       Console.SetCursorPosition(0, line);
@@ -188,6 +194,13 @@ namespace LauncherC_
       return currentLine;
     }
 
+    /// <summary>
+    /// Вывод строки информации с красным фоном.
+    /// </summary>
+    /// <param name="line">Строка в которой вывести.</param>
+    /// <param name="text">Текст.</param>
+    /// <param name="FillLine">Для закрашиваемого заднего фона.</param>
+    /// <returns>Указанная строка.</returns>
     public static int WriteLineInfo(int line, string text, int FillLine = Config.ConsoleWidth)
     {
       Console.BackgroundColor = ConsoleColor.White;

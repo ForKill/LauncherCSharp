@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -8,25 +7,62 @@ using System.Threading.Tasks;
 
 namespace LauncherC_
 {
+  /// <summary>
+  /// Сервис для загрузки файлов.
+  /// </summary>
   public class DownloadService
   {
+    /// <summary>
+    /// Список файлов которые требуется скачать.
+    /// </summary>
     private List<Download> downloads = new List<Download>();
+
+    /// <summary>
+    /// Экземпляр для работы с сервисом файлов.
+    /// </summary>
     private FilesService filesService = new FilesService();
+
+    /// <summary>
+    /// Экземпляр конфигураций.
+    /// </summary>
     private Config config = new Config();
 
+    /// <summary>
+    /// Добавление файла в лист скачивания.
+    /// </summary>
+    /// <param name="fullPathName">Полный путь скачивания.</param>
+    /// <param name="apiData">Сущность API данных файла.</param>
     public async Task AddDownloadQueue(string fullPathName, ApiData apiData) =>
       downloads.Add(new Download(Config.UrlFiles + fullPathName, apiData));
 
+    /// <summary>
+    /// Добавление файла в лист скачивания.
+    /// </summary>
+    /// <param name="apiData">Сущность API данных файла.</param>
     public async Task AddDownloadQueue(ApiData apiData) =>
       downloads.Add(new Download(Config.UrlFiles + apiData.Path + apiData.Name, apiData));
 
+    /// <summary>
+    /// Удаление из списка загрузки.
+    /// </summary>
+    /// <param name="download">Сущность удаляемого файла.</param>
     public async Task RemoveDownloadQueue(Download download) =>
       downloads.Remove(download);
 
+    /// <summary>
+    /// Очистка списка скачеваемых файлов.
+    /// </summary>
     public async Task Clear() => downloads.Clear();
 
+    /// <summary>
+    /// Список файлов для скачивания.
+    /// </summary>
+    /// <returns>Список сущности файлов.</returns>
     public async Task<List<Download>> GetDownloadQueue() => downloads;
 
+    /// <summary>
+    /// Скачать все файлы в списке.
+    /// </summary>
     public async Task DownloadAllAsync()
     {
       if (downloads.Count == 0)
@@ -45,6 +81,11 @@ namespace LauncherC_
       Lines.WriteLine("Все файлы загружены.");
     }
 
+    /// <summary>
+    /// Загрузка файла.
+    /// </summary>
+    /// <param name="url">Ссылка на файл.</param>
+    /// <param name="apiData">Сущность файла.</param>
     private async Task DownloadAsync(string url, ApiData apiData)
     {
       string filePath = config.FilesPath + "\\" + apiData.Path;
@@ -77,6 +118,11 @@ namespace LauncherC_
       }
     }
 
+    /// <summary>
+    /// Скорость загрузки.
+    /// </summary>
+    /// <param name="downloadProgressChangedEventArgs">Данные загрузки.</param>
+    /// <returns>Скорость скачивания.</returns>
     public static string GetDownloadSpeed(DownloadProgressChangedEventArgs downloadProgressChangedEventArgs)
     {
       double bytesIn = double.Parse(downloadProgressChangedEventArgs.BytesReceived.ToString());
