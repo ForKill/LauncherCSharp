@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Net;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Microsoft.VisualBasic;
 /*
  * 
       // benchmarkdotnet
@@ -12,24 +16,60 @@ namespace LauncherC_
 {
   internal class Program
   {
-    private static ApiDataApp apiVersion;
+    #region Кастыль юникода
+    // Кастыль для нормального отображения юникода (а именно подчеркивание)
+    const int STD_OUTPUT_HANDLE = -11;
+    const uint ENABLE_VIRTUAL_TERMINAL_PROCESSING = 4;
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    static extern IntPtr GetStdHandle(int nStdHandle);
+
+    [DllImport("kernel32.dll")]
+    static extern bool GetConsoleMode(IntPtr hConsoleHandle, out uint lpMode);
+
+    [DllImport("kernel32.dll")]
+    static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
+    #endregion
+
     static async Task Main(string[] args)
     {
+      #region Кастыль юникода
+      var handle = GetStdHandle(STD_OUTPUT_HANDLE);
+      uint mode;
+      GetConsoleMode(handle, out mode);
+      mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+      SetConsoleMode(handle, mode);
+      #endregion
+
       Console.Title = "LauncherCSharp";
       Console.WindowWidth = Config.ConsoleWidth;
       Console.WindowHeight = Config.ConsoleHeight;
       Console.OutputEncoding = System.Text.Encoding.Default;
 
       ApiDataService apiDataService = new ApiDataService();
+      ApiDataManager apiDataManager = new ApiDataManager();
       DownloadService downloadService = new DownloadService();
       FilesService filesService = new FilesService();
+      FilesManager filesManager = new FilesManager();
 
-      apiVersion = await apiDataService.GetActualVersion();
-      Lines.VersionLineNumber = Lines.WriteLineInfo($"Сборка: v{apiVersion.Version} | HASH:{apiVersion.Hash}");
+      ApiDataApp apiDataApp = await apiDataService.GetActualVersion();
+      if (apiDataApp == null)
+      {
+        filesManager.DownloadAll(true);
+        apiDataApp = await apiDataService.GetActualVersionAPI();
+      }
+
+      await apiDataService.SetVersion(apiDataApp);
+
+      apiDataApp = apiDataService.GetVersion();
+      Lines.VersionLineNumber = Lines.WriteLineInfo($"Сборка: v{apiDataApp.Version} | HASH:{apiDataApp.Hash}");
       Lines.WriteLineInfo(" 1 - Выполнить полную проверку файлов.");
       Lines.WriteLineInfo(" 2 - Просмотреть очередь на скачивание.");
       Lines.WriteLineInfo(" 3 - Начать загрузку файлов.");
-      Lines.WriteLineInfo(" 4 - Проверка измененных файлов по дате изменения.");
+      Lines.WriteLineInfo(" 6 - Сгенерировать новый рандомный файл API. (Эмуляция для обновления сборки)");
+      Lines.WriteLineInfo(" 7 - Обновить все сгенерированные .txt файлы API. (Эмуляция обновления существующего файла)");
+      Lines.WriteLineInfo(" 8 - Удалить все сгенерированные .txt файлы API. (Эмуляция обновления с удаление файлов)");
+      Lines.WriteLineInfo(" 9 - Обновить сборку API. (Эмуляция для обновления сборки)");
       Lines.ErrorInfoLineNumber = Lines.WriteLine(new String(' ', Config.ConsoleWidth));
       Lines.InfoLineNumber = Lines.WriteLine(string.Empty);
     
@@ -37,15 +77,11 @@ namespace LauncherC_
 
       var timer = new Timers(async () =>
       {
-        ApiDataApp version = await apiDataService.GetActualVersion();
-        if (version.Hash != apiVersion.Hash)
-        {
-          Lines.ShowInfo($"Сборка файлов обновлена", ConsoleColor.Yellow);
-          Lines.WriteLineInfo(Lines.VersionLineNumber, $"Сборка: v{apiVersion.Version} | HASH:{apiVersion.Hash}");
-        }
+        await apiDataManager.CheckUpdate(apiDataService);
       });
       var task = timer.Start();
 
+      int lastPressKey = 0;
       ConsoleKeyInfo KeyInfo;
       do
       {
@@ -57,51 +93,7 @@ namespace LauncherC_
           {
             case 49:
               {
-                Lines.DeleteFromLast(Lines.InfoLineNumber + 1);
-                Lines.ShowInfo($"Получаем API списка файлов.", ConsoleColor.Gray);
-
-                Dictionary<string, ApiData> apiData = await apiDataService.GetData();
-
-                if(apiData.Count == 0)
-                {
-                  Lines.ShowErrorInfo("Данных API нет.");
-                  break;
-                }
-
-                var uFiles = await apiDataService.GetUnnecessaryFiles();
-
-                foreach (var file in uFiles)
-                {
-                  File.Delete(file);
-                  Lines.WriteLine($"Файл \"{file}\" удален.");
-                }
-
-                var jFiles = await filesService.GetFiles();
-
-                if(jFiles != null)
-                {
-                  foreach(var file in jFiles)
-                  {
-                    if(!apiData.Keys.Contains(file.Path))
-                    {
-                      await filesService.Delete(file);
-                    }
-                  }
-                }
-
-
-                await downloadService.Clear();
-                foreach (var apidata in apiData)
-                {
-                  /*if(File.Exists(apidata.Key))
-                  { 
-                    Files data = await filesService.GetFileData(apidata.Key);
-                    if (data != null && data.Size == apidata.Value.Size)
-                      continue;
-                  }*/
-                  await downloadService.AddDownloadQueue(apidata.Key, apidata.Value);
-                  Lines.WriteLine($"Файл \"{apidata.Key}\" добавлен в очередь на скачивание.");
-                }
+                await filesManager.CheckingForDownload(apiDataService, filesService, downloadService);
                 break;
               }
             case 50:
@@ -110,7 +102,7 @@ namespace LauncherC_
                 var downloadList = await downloadService.GetDownloadQueue();
 
                 foreach (var download in downloadList)
-                  Lines.WriteLine($"{downloadList.IndexOf(download) + 1}. {download.ApiData} ({download.Url})");
+                  Lines.WriteLine($"{downloadList.IndexOf(download) + 1}. {download.ApiData.Path + download.ApiData.Name} ({download.Url})");
                 
                 break;
               }
@@ -120,9 +112,49 @@ namespace LauncherC_
                 await downloadService.DownloadAllAsync();
                 break;
               }
-            case 46:
+            case 54:
               {
+                if(lastPressKey != intKey)
+                  Lines.DeleteFromLast(Lines.InfoLineNumber + 1);
 
+                using (var client = new WebClient())
+                {
+                  var contents = client.DownloadString("https://test.criminalrussia.org/launcher_c_sharp/check.php?token=ad232fbxsdf43&class=createfile");
+                  Lines.WriteLine($"Файл {contents} создан успешно.");
+                }
+                break;
+              }
+            case 55:
+              {
+                Lines.DeleteFromLast(Lines.InfoLineNumber + 1);
+                using (var client = new WebClient())
+                {
+                  var contents = client.DownloadString("https://test.criminalrussia.org/launcher_c_sharp/check.php?token=ad232fbxsdf43&class=updatefile");
+                  var content = contents.Split("<br />");
+                  Lines.WriteLine($"Файлов обновивших информацию: {content.Length - 1}");
+                }
+                break;
+              }
+            case 56:
+              {
+                Lines.DeleteFromLast(Lines.InfoLineNumber + 1);
+                using (var client = new WebClient())
+                {
+                  var contents = client.DownloadString("https://test.criminalrussia.org/launcher_c_sharp/check.php?token=ad232fbxsdf43&class=deletefile");
+                  var content = contents.Split("<br />");
+                  Lines.WriteLine($"Файло удалено: {content.Length - 1}");
+                }
+                break;
+              }
+            case 57:
+              {
+                Lines.DeleteFromLast(Lines.InfoLineNumber + 1);
+                Lines.WriteLine($"Обновление API (Ожидайте).");
+                using (var client = new WebClient())
+                {
+                  var contents = client.DownloadString("https://test.criminalrussia.org/launcher_c_sharp/check.php?token=ad232fbxsdf43&class=education");
+                }
+                Lines.WriteLine($"API обновлен.");
                 break;
               }
             default:
@@ -131,6 +163,7 @@ namespace LauncherC_
                 break;
               }
           }
+          lastPressKey = intKey;
         }
       } while (KeyInfo.Key != ConsoleKey.Escape);
 

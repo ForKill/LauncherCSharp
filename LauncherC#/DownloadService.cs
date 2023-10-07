@@ -32,7 +32,7 @@ namespace LauncherC_
       if (downloads.Count == 0)
         return;
 
-      Lines.DownloadLineNumber = Lines.WriteLine($"Начинаем загрузку файлов...");
+      Lines.DownloadLineNumber = Lines.WriteLine(Lines.InfoLineNumber + 1, $"Начинаем загрузку файлов...");
       var d = downloads.ToList();
       foreach (var download in d)
       {
@@ -68,7 +68,7 @@ namespace LauncherC_
 
           await client.DownloadFileTaskAsync(new Uri(url), fullPath);
           
-          await filesService.Add(apiData.Path + apiData.Name);
+          await filesService.Add(apiData.Path + apiData.Name, apiData.Hash);
         }
         catch (WebException ex)
         {

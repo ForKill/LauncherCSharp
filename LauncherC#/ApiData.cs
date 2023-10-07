@@ -1,5 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
+using System.Xml.Linq;
+
 namespace LauncherC_
 {
   public class ApiData
@@ -39,5 +43,14 @@ namespace LauncherC_
   {
     public string Hash { get; set; }
     public int Version { get; set; }
+
+    public override bool Equals(object obj)
+    {
+      if (obj is ApiDataApp other)
+        return this.Hash == other.Hash && this.Version == other.Version;
+      return false;
+    }
+
+    public override int GetHashCode() => HashCode.Combine(Hash, Version);
   }
 }

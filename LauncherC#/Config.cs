@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace LauncherC_
 {
@@ -16,6 +11,7 @@ namespace LauncherC_
     public const string AppUpdate = Api + "appupdate";
     public string FilesPath { get; } = AppDomain.CurrentDomain.BaseDirectory + "Education\\";
     public string FilesSave { get; } = AppDomain.CurrentDomain.BaseDirectory + "files.json";
+    public string VersionSave { get; } = AppDomain.CurrentDomain.BaseDirectory + "version.json";
 
     /// <summary>
     /// Ширина консоли.

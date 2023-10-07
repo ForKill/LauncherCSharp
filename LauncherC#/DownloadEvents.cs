@@ -15,8 +15,11 @@ namespace LauncherC_
       {
         NetworkSpeed.AddInfo(downloadProgressChangedEventArgs.BytesReceived - lastRecorded);
         lastRecorded = downloadProgressChangedEventArgs.BytesReceived;
-        Lines.WriteLine(Lines.DownloadLineNumber + 1, $"Прогресс: {downloadProgressChangedEventArgs.BytesReceived} / {downloadProgressChangedEventArgs.TotalBytesToReceive} ({downloadProgressChangedEventArgs.ProgressPercentage}%)");
-        Lines.WriteLine(Lines.DownloadLineNumber + 2, $"Скорость: {Utils.HumanizeByteSize(NetworkSpeed.TotalSpeed)}");
+        if (Lines.DownloadLineNumber > 0)
+        { 
+          Lines.WriteLine(Lines.DownloadLineNumber + 1, $"Прогресс: {downloadProgressChangedEventArgs.BytesReceived} / {downloadProgressChangedEventArgs.TotalBytesToReceive} ({downloadProgressChangedEventArgs.ProgressPercentage}%)");
+          Lines.WriteLine(Lines.DownloadLineNumber + 2, $"Скорость: {Utils.HumanizeByteSize(NetworkSpeed.TotalSpeed)}");
+        }
       }
     }
   }

@@ -1,21 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LauncherC_
 {
   public static class Utils
   {
-    public static string GetHash(string input)
+    public static string GetStringHash(string input)
     {
-      var md5 = MD5.Create();
-      var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(input));
-      return Convert.ToBase64String(hash);
+      using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
+      {
+        byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
+        byte[] hashBytes = md5.ComputeHash(inputBytes);
+
+        return Convert.ToHexString(hashBytes); // .NET 5 +
+      }
     }
 
     public static string HumanizeByteSize(this long byteCount)
@@ -35,6 +38,33 @@ namespace LauncherC_
         return string.Empty;
 
       return HumanizeByteSize((long)byteCount);
+    }
+
+    public static string CalculateMD5(string filename)
+    {
+      try
+      {
+        using (var md5 = IncrementalHash.CreateHash(HashAlgorithmName.MD5))
+        {
+          using (var stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
+          {
+            byte[] buffer = new byte[4096];
+            int bytesRead = 0;
+            do
+            {
+              bytesRead = stream.Read(buffer, 0, buffer.Length);
+              md5.AppendData(buffer, 0, bytesRead);
+            }
+            while (bytesRead > 0);
+          }
+          string actualHash = BitConverter.ToString(md5.GetHashAndReset()).Replace("-", string.Empty).ToLowerInvariant();
+          return actualHash;
+        }
+      }
+      catch (Exception ex)
+      {
+        return filename;
+      }
     }
   }
 }

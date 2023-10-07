@@ -27,7 +27,7 @@ namespace LauncherC_
     /// <summary>
     /// Номер строки для вывода версии сборки.
     /// </summary>
-    public static int VersionLineNumber;
+    public static int VersionLineNumber = -1;
 
     /// <summary>
     /// Строка загрузки.
@@ -172,6 +172,7 @@ namespace LauncherC_
     /// <returns>Возращает актуальный номер строки.</returns>
     public static int WriteLineInfo(string text, int FillLine = Config.ConsoleWidth)
     {
+      int currentLine = LineNumber;
       Console.BackgroundColor = ConsoleColor.White;
       Console.ForegroundColor = ConsoleColor.Black;
 
@@ -184,7 +185,7 @@ namespace LauncherC_
       SetDefaultColor();
 
       LineNumber++;
-      return LineNumber;
+      return currentLine;
     }
 
     public static int WriteLineInfo(int line, string text, int FillLine = Config.ConsoleWidth)
@@ -200,7 +201,7 @@ namespace LauncherC_
         Console.Write(text + new String(' ', FillLine - size));
 
       SetDefaultColor();
-
+      Console.SetCursorPosition(0, LineNumber);
       return line;
     }
 
