@@ -11,10 +11,16 @@ namespace LauncherC_
   /// </summary>
   internal class FilesService
   {
+    #region Поля и свойства
+
     /// <summary>
     /// Экземпляр конфигураций.
     /// </summary>
     private Config config = new Config();
+
+    #endregion
+
+    #region Методы
 
     /// <summary>
     /// Добавить данные в files.json
@@ -134,5 +140,7 @@ namespace LauncherC_
       
       File.Delete(config.FilesSave);
     }
+
+    #endregion
   }
 }

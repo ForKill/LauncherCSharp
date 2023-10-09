@@ -113,44 +113,72 @@ namespace LauncherC_
                 if(lastPressKey != intKey)
                   Lines.DeleteFromLast(Lines.InfoLineNumber + 1);
 
-                using (var client = new WebClient())
+                try
                 {
-                  var contents = client.DownloadString("https://test.criminalrussia.org/launcher_c_sharp/check.php?token=ad232fbxsdf43&class=createfile");
-                  Lines.WriteLine($"Файл {contents} создан успешно.");
+                  using (var client = new WebClient())
+                  {
+                    var contents = client.DownloadString("https://test.criminalrussia.org/launcher_c_sharp/check.php?token=ad232fbxsdf43&class=createfile");
+                    Lines.WriteLine($"Файл {contents} создан успешно.");
+                  }
+                }
+                catch (Exception ex)
+                {
+                  Lines.ShowErrorInfo(ex.Message);
                 }
                 break;
               }
             case 55:
               {
                 Lines.DeleteFromLast(Lines.InfoLineNumber + 1);
-                using (var client = new WebClient())
+                try
                 {
-                  var contents = client.DownloadString("https://test.criminalrussia.org/launcher_c_sharp/check.php?token=ad232fbxsdf43&class=updatefile");
-                  var content = contents.Split("<br />");
-                  Lines.WriteLine($"Файлов обновивших информацию: {content.Length - 1}");
+                  using (var client = new WebClient())
+                  {
+                    var contents = client.DownloadString("https://test.criminalrussia.org/launcher_c_sharp/check.php?token=ad232fbxsdf43&class=updatefile");
+                    var content = contents.Split("<br />");
+                    Lines.WriteLine($"Файлов обновивших информацию: {content.Length - 1}");
+                  }
+                }
+                catch (Exception ex)
+                {
+                  Lines.ShowErrorInfo(ex.Message);
                 }
                 break;
               }
             case 56:
               {
                 Lines.DeleteFromLast(Lines.InfoLineNumber + 1);
-                using (var client = new WebClient())
+                try
                 {
-                  var contents = client.DownloadString("https://test.criminalrussia.org/launcher_c_sharp/check.php?token=ad232fbxsdf43&class=deletefile");
-                  var content = contents.Split("<br />");
-                  Lines.WriteLine($"Файло удалено: {content.Length - 1}");
+                  using (var client = new WebClient())
+                  {
+                    var contents = client.DownloadString("https://test.criminalrussia.org/launcher_c_sharp/check.php?token=ad232fbxsdf43&class=deletefile");
+                    var content = contents.Split("<br />");
+                    Lines.WriteLine($"Файло удалено: {content.Length - 1}");
+                  }
+                }
+                catch (Exception ex)
+                {
+                  Lines.ShowErrorInfo(ex.Message);
                 }
                 break;
               }
             case 57:
               {
                 Lines.DeleteFromLast(Lines.InfoLineNumber + 1);
-                Lines.WriteLine($"Обновление API (Ожидайте).");
-                using (var client = new WebClient())
+                try
                 {
-                  var contents = client.DownloadString("https://test.criminalrussia.org/launcher_c_sharp/check.php?token=ad232fbxsdf43&class=education");
+                  Lines.WriteLine($"Обновление API (Ожидайте).");
+                  using (var client = new WebClient())
+                  {
+                    var contents = client.DownloadString("https://test.criminalrussia.org/launcher_c_sharp/check.php?token=ad232fbxsdf43&class=education");
+                  }
+                  Lines.WriteLine($"API обновлен.");
                 }
-                Lines.WriteLine($"API обновлен.");
+                catch (Exception ex)
+                {
+                  Lines.ShowErrorInfo(ex.Message);
+                }
                 break;
               }
             default:

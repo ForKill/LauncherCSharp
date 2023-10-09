@@ -8,10 +8,11 @@ using System.Linq;
 /// </summary>
 public class NetworkSpeed
 {
+  #region Поля и свойства
+
   /// <summary>
   /// Возвращает общую скорость сети в байтах в секунду.
   /// </summary>
-
   private static double totalSpeed = 0;
   public static double TotalSpeed
   {
@@ -41,6 +42,10 @@ public class NetworkSpeed
   private static readonly LimitedConcurrentQueue<double> LastSpeeds = new LimitedConcurrentQueue<double>(Seconds);
 
   private static readonly ConcurrentQueue<long> ReceivedStorage = new ConcurrentQueue<long>();
+
+  #endregion
+
+  #region Методы
 
   /// <summary>
   /// Очищает полученные данные и сбрасывает общую скорость.
@@ -88,4 +93,6 @@ public class NetworkSpeed
   }
 
   private static void OnUpdated(double obj) => Updated?.Invoke(obj);
+
+  #endregion
 }

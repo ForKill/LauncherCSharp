@@ -25,9 +25,10 @@ namespace LauncherC_
     {
       lock (ConsoleLock)
       {
+        var rec = lastRecorded;
         NetworkSpeed.AddInfo(downloadProgressChangedEventArgs.BytesReceived - lastRecorded);
         lastRecorded = downloadProgressChangedEventArgs.BytesReceived;
-        if (Lines.DownloadLineNumber > 0)
+        if (Lines.DownloadLineNumber > 0 && rec > 0 && NetworkSpeed.TotalSpeed > 0 && downloadProgressChangedEventArgs.ProgressPercentage > 0)
         { 
           Lines.WriteLine(Lines.DownloadLineNumber + 1, $"Прогресс: {downloadProgressChangedEventArgs.BytesReceived} / {downloadProgressChangedEventArgs.TotalBytesToReceive} ({downloadProgressChangedEventArgs.ProgressPercentage}%)");
           Lines.WriteLine(Lines.DownloadLineNumber + 2, $"Скорость: {Utils.HumanizeByteSize(NetworkSpeed.TotalSpeed)}");

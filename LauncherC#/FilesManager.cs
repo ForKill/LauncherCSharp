@@ -11,6 +11,8 @@ namespace LauncherC_
   /// </summary>
   internal class FilesManager
   {
+    #region Поля и свойства
+
     /// <summary>
     /// Экземпляр конфигураций.
     /// </summary>
@@ -20,6 +22,10 @@ namespace LauncherC_
     /// Скачать ли принудительно все заново.
     /// </summary>
     private bool downloadAll = false;
+
+    #endregion
+
+    #region Методы
 
     /// <summary>
     /// Установка значения для скачивания без проверок.
@@ -45,11 +51,20 @@ namespace LauncherC_
       Lines.DeleteFromLast(Lines.InfoLineNumber + 1);
       Lines.ShowInfo($"Получаем API списка файлов.", ConsoleColor.DarkGray);
 
-      Dictionary<string, ApiData> apiData = await apiDataService.GetData();
-
-      if (apiData.Count == 0)
+      Dictionary<string, ApiData> apiData;
+      try
       {
-        Lines.ShowErrorInfo("Данных API нет.");
+        apiData = await apiDataService.GetData();
+
+        if (apiData.Count == 0)
+        {
+          Lines.ShowErrorInfo("Данных API нет.");
+          return;
+        }
+      }
+      catch (Exception ex)
+      {
+        Lines.ShowErrorInfo(ex.Message);
         return;
       }
 
@@ -125,10 +140,12 @@ namespace LauncherC_
       }
 
       var filesQueue = await downloadService.GetDownloadQueue();
-      if(filesQueue.Count > 0)
+      if (filesQueue.Count > 0)
         Lines.ShowInfo($"Кол-во файлов требущих обновление: {filesQueue.Count}", ConsoleColor.DarkGray);
       else
         Lines.ShowInfo("Нет файлов требующих обновления.", ConsoleColor.DarkGray);
     }
+
+    #endregion
   }
 }

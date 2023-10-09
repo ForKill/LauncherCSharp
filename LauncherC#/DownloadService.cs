@@ -12,6 +12,8 @@ namespace LauncherC_
   /// </summary>
   public class DownloadService
   {
+    #region Поля и свойства
+
     /// <summary>
     /// Список файлов которые требуется скачать.
     /// </summary>
@@ -26,6 +28,10 @@ namespace LauncherC_
     /// Экземпляр конфигураций.
     /// </summary>
     private Config config = new Config();
+
+    #endregion
+
+    #region Методы
 
     /// <summary>
     /// Добавление файла в лист скачивания.
@@ -75,7 +81,7 @@ namespace LauncherC_
         await DownloadAsync(download.Url, download.ApiData);
         await RemoveDownloadQueue(download);
       }
-      Lines.LineNumber = Lines.DownloadLineNumber + 3;
+      Lines.LineNumber = Lines.DownloadLineNumber + 50;
       Lines.DownloadLineNumber = 0;
       Lines.DeleteFromLast(Lines.InfoLineNumber + 1);
       Lines.WriteLine("Все файлы загружены.");
@@ -99,15 +105,15 @@ namespace LauncherC_
         client.DownloadProgressChanged += async (sender, args) =>
           downloadEvents.ProgressCallbackAsync(sender, args);
 
-        string fullPath = filePath + "\\" + apiData.Name;
+        string fullPathName = filePath + "\\" + apiData.Name;
         try
         {
-          if(Lines.DownloadLineNumber == 0)
+          if (Lines.DownloadLineNumber == 0)
             Lines.DownloadLineNumber = Lines.WriteLine($"Загрузка файла {apiData.Name}");
           else
-            Lines.WriteLine(Lines.DownloadLineNumber, $"Загрузка файла {apiData.Name}");
+            Lines.WriteLine(Lines.DownloadLineNumber, $"Загрузка файла {apiData.Name}");          
 
-          await client.DownloadFileTaskAsync(new Uri(url), fullPath);
+          await client.DownloadFileTaskAsync(new Uri(url), fullPathName);
           
           await filesService.Add(apiData.Path + apiData.Name, apiData.Hash);
         }
@@ -132,5 +138,7 @@ namespace LauncherC_
       double speed = (bytesIn / 1024) / downloadProgressChangedEventArgs.ProgressPercentage;
       return speed.ToString("0.00");
     }
+
+    #endregion
   }
 }

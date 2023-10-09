@@ -9,6 +9,8 @@ namespace LauncherC_
   /// </summary>
   internal class Timers
   {
+    #region Поля и свойства
+
     /// <summary>
     /// Событие таймера.
     /// </summary>
@@ -25,6 +27,10 @@ namespace LauncherC_
     private Timer timer;
 
     private CancellationTokenSource cancellationTokenSource;
+
+    #endregion
+
+    #region Методы
 
     /// <summary>
     /// Конструктор.
@@ -72,5 +78,7 @@ namespace LauncherC_
         Lines.ShowErrorInfo(ex.Message);
       }
     }
+
+    #endregion
   }
 }

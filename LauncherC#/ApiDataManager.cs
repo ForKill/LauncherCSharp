@@ -14,10 +14,17 @@ namespace LauncherC_
     /// <param name="apiDataService">Сущность версии.</param>
     public async Task CheckUpdate(ApiDataService apiDataService)
     {
-      ApiDataApp apiDataApp = apiDataService.GetVersion();
-      ApiDataApp apiVersionActual = await apiDataService.GetActualVersionAPI();
-      if (!apiDataApp.Equals(apiVersionActual))
-        await apiDataService.SetVersion(apiVersionActual, apiDataService, OnChangeVersion);
+      try
+      {
+        ApiDataApp apiDataApp = apiDataService.GetVersion();
+        ApiDataApp apiVersionActual = await apiDataService.GetActualVersionAPI();
+        if (!apiDataApp.Equals(apiVersionActual))
+          await apiDataService.SetVersion(apiVersionActual, apiDataService, OnChangeVersion);
+      }
+      catch (Exception ex)
+      {
+        Lines.ShowErrorInfo(ex.Message);
+      }
     }
 
     /// <summary>

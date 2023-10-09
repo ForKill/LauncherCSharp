@@ -13,6 +13,8 @@ namespace LauncherC_
   /// </summary>
   public class ApiDataService
   {
+    #region Поля и свойства
+
     /// <summary>
     /// Обработчик событий обновления версии сборки.
     /// </summary>
@@ -32,6 +34,10 @@ namespace LauncherC_
     /// Экземпляр работы с файлами API и ключем.
     /// </summary>
     private Dictionary<string, ApiData> apiData = new Dictionary<string, ApiData>();
+
+    #endregion
+
+    #region Методы
 
     /// <summary>
     /// Загрузка данных из API.
@@ -130,5 +136,7 @@ namespace LauncherC_
       }
       return files;
     }
+
+    #endregion
   }
 }

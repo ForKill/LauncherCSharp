@@ -3,11 +3,13 @@ using System.Collections.Generic;
 
 namespace LauncherC_
 {
+  #region Класс ApiData
   /// <summary>
   /// Обращение к API данным.
   /// </summary>
   public class ApiData
   {
+    #region Поля и свойства
     /// <summary>
     /// Имя файла.
     /// </summary>
@@ -27,6 +29,8 @@ namespace LauncherC_
     /// Размер файла.
     /// </summary>
     public long Size { get; set; }
+
+    #endregion
 
     /// <summary>
     /// Конструктор файлов.
@@ -59,6 +63,10 @@ namespace LauncherC_
 
   }
 
+  #endregion
+
+  #region Класс ApiDataRoot
+
   /// <summary>
   /// Обращение к API данным с ключом.
   /// </summary>
@@ -66,6 +74,10 @@ namespace LauncherC_
   {
     public Dictionary<string, ApiData> apidata { get; set; }
   }
+
+  #endregion
+
+  #region Класс ApiDataApp
 
   /// <summary>
   /// Обращение к данным API версии сборки.
@@ -91,4 +103,6 @@ namespace LauncherC_
 
     public override int GetHashCode() => HashCode.Combine(Hash, Version);
   }
+
+  #endregion
 }
