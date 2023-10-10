@@ -65,14 +65,43 @@ namespace LauncherC_
       Lines.WriteLineInfo(" 7 - Обновить все сгенерированные .txt файлы API. (Эмуляция обновления существующего файла)");
       Lines.WriteLineInfo(" 8 - Удалить все сгенерированные .txt файлы API. (Эмуляция обновления с удаление файлов)");
       Lines.WriteLineInfo(" 9 - Обновить сборку API. (Эмуляция для обновления сборки)");
+      Lines.WriteLineInfo(" 0 - Автоматическая эмуляция сборки.");
       Lines.ErrorInfoLineNumber = Lines.WriteLine(new String(' ', Config.ConsoleWidth));
       Lines.InfoLineNumber = Lines.WriteLine(string.Empty);
     
       Lines.SetDefaultColor();
 
+      bool autoUpdate = false;
+      if(args.Length > 0)
+      {
+        foreach (string arg in args)
+        {
+          if (arg == "-autoupdate")
+          {
+            autoUpdate = true;
+
+            await filesManager.CheckingForDownload(apiDataService, filesService, downloadService);
+            if (await downloadService.GetDownloadQueueCount() > 0)
+            {
+              filesManager.DownloadAll(false);
+              await downloadService.DownloadAllAsync();
+            }
+            else
+            {
+              Lines.ShowInfo($"Автообновление включено.", ConsoleColor.Green);
+            }
+          }
+        }
+      }
+
       var timer = new Timers(async () =>
       {
-        await apiDataManager.CheckUpdate(apiDataService);
+        if (await apiDataManager.CheckUpdate(apiDataService) && autoUpdate)
+        {
+          await filesManager.CheckingForDownload(apiDataService, filesService, downloadService);
+          filesManager.DownloadAll(false);
+          await downloadService.DownloadAllAsync();
+        }
       });
       var task = timer.Start();
 
@@ -154,7 +183,7 @@ namespace LauncherC_
                   {
                     var contents = client.DownloadString("https://test.criminalrussia.org/launcher_c_sharp/check.php?token=ad232fbxsdf43&class=deletefile");
                     var content = contents.Split("<br />");
-                    Lines.WriteLine($"Файло удалено: {content.Length - 1}");
+                    Lines.WriteLine($"Файлов удалено: {content.Length - 1}");
                   }
                 }
                 catch (Exception ex)
@@ -181,6 +210,46 @@ namespace LauncherC_
                 }
                 break;
               }
+            case 48:
+              {
+                Lines.DeleteFromLast(Lines.InfoLineNumber + 1);
+                try
+                {
+                  Lines.WriteLine($"Автоэмитация, ожидайте.");
+                  using (var client = new WebClient())
+                  {
+                    Random rnd = new Random();
+                    string contents;
+
+                    if (rnd.Next(2) > 0)
+                    {
+                      contents = client.DownloadString("https://test.criminalrussia.org/launcher_c_sharp/check.php?token=ad232fbxsdf43&class=deletefile");
+                      var content = contents.Split("<br />");
+                      Lines.WriteLine($"Файлов удалено: {content.Length - 1}");
+                    }
+
+                    if (rnd.Next(2) > 0)
+                    {
+                      contents = client.DownloadString("https://test.criminalrussia.org/launcher_c_sharp/check.php?token=ad232fbxsdf43&class=updatefile");
+                      var content = contents.Split("<br />");
+                      Lines.WriteLine($"Файлов обновивших информацию: {content.Length - 1}");
+                    }
+
+                    for (int i = 0; i < rnd.Next(0, 60); i++)
+                    {
+                      contents = client.DownloadString("https://test.criminalrussia.org/launcher_c_sharp/check.php?token=ad232fbxsdf43&class=createfile");
+                      Lines.WriteLine($"Файл {contents} создан успешно.");
+                    }
+                    contents = client.DownloadString("https://test.criminalrussia.org/launcher_c_sharp/check.php?token=ad232fbxsdf43&class=education");
+                  }
+                  Lines.WriteLine($"API обновлен.");
+                }
+                catch (Exception ex)
+                {
+                  Lines.ShowErrorInfo(ex.Message);
+                }
+                break;
+              }
             default:
               {
 
@@ -192,7 +261,7 @@ namespace LauncherC_
       } while (KeyInfo.Key != ConsoleKey.Escape);
 
       timer.Stop();
-      task.Wait();
+      task.Dispose();
     }
   }
 }

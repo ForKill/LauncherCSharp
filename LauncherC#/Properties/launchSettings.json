@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "LauncherC#": {
+      "commandName": "Project",
+      "commandLineArgs": "-autoupdate"
+    }
+  }
+}

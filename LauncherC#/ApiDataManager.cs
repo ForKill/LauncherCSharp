@@ -12,19 +12,23 @@ namespace LauncherC_
     /// Проверка обновления сборки.
     /// </summary>
     /// <param name="apiDataService">Сущность версии.</param>
-    public async Task CheckUpdate(ApiDataService apiDataService)
+    public async Task<bool> CheckUpdate(ApiDataService apiDataService)
     {
       try
       {
         ApiDataApp apiDataApp = apiDataService.GetVersion();
         ApiDataApp apiVersionActual = await apiDataService.GetActualVersionAPI();
         if (!apiDataApp.Equals(apiVersionActual))
+        {
           await apiDataService.SetVersion(apiVersionActual, apiDataService, OnChangeVersion);
+          return true;
+        }
       }
       catch (Exception ex)
       {
         Lines.ShowErrorInfo(ex.Message);
       }
+      return false;
     }
 
     /// <summary>

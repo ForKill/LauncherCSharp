@@ -67,6 +67,12 @@ namespace LauncherC_
     public async Task<List<Download>> GetDownloadQueue() => downloads;
 
     /// <summary>
+    /// Кол-во в очереди.
+    /// </summary>
+    /// <returns>Кол-во файлов требующих скачать.</returns>
+    public async Task<int> GetDownloadQueueCount() => downloads.Count;
+
+    /// <summary>
     /// Скачать все файлы в списке.
     /// </summary>
     public async Task DownloadAllAsync()
