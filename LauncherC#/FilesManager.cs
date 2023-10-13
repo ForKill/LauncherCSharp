@@ -31,13 +31,19 @@ namespace LauncherC_
     /// Установка значения для скачивания без проверок.
     /// </summary>
     /// <param name="status">true/false</param>
-    public void DownloadAll(bool status) => downloadAll = status;
+    public void DownloadAll(bool status)
+    {
+      downloadAll = status;
+    }
 
     /// <summary>
     /// Статус для скачивания без проверок.
     /// </summary>
     /// <returns>true/false</returns>
-    public bool DownloadAll() => downloadAll;
+    public bool DownloadAll()
+    {
+      return downloadAll;
+    }
 
     /// <summary>
     /// Полный процесс проверки файлов.

@@ -73,14 +73,19 @@ namespace LauncherC_
     /// <summary>
     /// Очистка API файлов.
     /// </summary>
-    public void ClearData() => apiData.Clear();
+    public void ClearData()
+    {
+      apiData.Clear();
+    }
 
     /// <summary>
     /// Актуальные данные версии сборки с сайта API.
     /// </summary>
     /// <returns>Сущность актуальных данных сборки API.</returns>
-    public async Task<ApiDataApp> GetActualVersionAPI() => 
-      JsonSerializer.Deserialize<ApiDataApp>(new WebClient().DownloadString(Config.AppUpdate));
+    public async Task<ApiDataApp> GetActualVersionAPI()
+    {
+      return JsonSerializer.Deserialize<ApiDataApp>(new WebClient().DownloadString(Config.AppUpdate));
+    }
 
     /// <summary>
     /// Актуальные данные сборки из локального файла.
@@ -115,7 +120,10 @@ namespace LauncherC_
     /// Данные версии API в памяти.
     /// </summary>
     /// <returns>Сущность с данными версии сборки.</returns>
-    public ApiDataApp GetVersion() => apiVersion;
+    public ApiDataApp GetVersion()
+    {
+      return apiVersion;
+    }
 
     /// <summary>
     /// Вывести не аутальные данные в files.json

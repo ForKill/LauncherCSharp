@@ -38,39 +38,53 @@ namespace LauncherC_
     /// </summary>
     /// <param name="fullPathName">Полный путь скачивания.</param>
     /// <param name="apiData">Сущность API данных файла.</param>
-    public async Task AddDownloadQueue(string fullPathName, ApiData apiData) =>
+    public async Task AddDownloadQueue(string fullPathName, ApiData apiData)
+    {
       downloads.Add(new Download(Config.UrlFiles + fullPathName, apiData));
+    }
 
     /// <summary>
     /// Добавление файла в лист скачивания.
     /// </summary>
     /// <param name="apiData">Сущность API данных файла.</param>
-    public async Task AddDownloadQueue(ApiData apiData) =>
+    public async Task AddDownloadQueue(ApiData apiData)
+    {
       downloads.Add(new Download(Config.UrlFiles + apiData.Path + apiData.Name, apiData));
+    }
 
     /// <summary>
     /// Удаление из списка загрузки.
     /// </summary>
     /// <param name="download">Сущность удаляемого файла.</param>
-    public async Task RemoveDownloadQueue(Download download) =>
+    public async Task RemoveDownloadQueue(Download download)
+    {
       downloads.Remove(download);
+    }
 
     /// <summary>
     /// Очистка списка скачеваемых файлов.
     /// </summary>
-    public async Task Clear() => downloads.Clear();
+    public async Task Clear()
+    {
+      downloads.Clear();
+    }
 
     /// <summary>
     /// Список файлов для скачивания.
     /// </summary>
     /// <returns>Список сущности файлов.</returns>
-    public async Task<List<Download>> GetDownloadQueue() => downloads;
-
+    public async Task<List<Download>> GetDownloadQueue()
+    {
+      return downloads;
+    }
     /// <summary>
     /// Кол-во в очереди.
     /// </summary>
     /// <returns>Кол-во файлов требующих скачать.</returns>
-    public async Task<int> GetDownloadQueueCount() => downloads.Count;
+    public async Task<int> GetDownloadQueueCount()
+    {
+      return downloads.Count;
+    }
 
     /// <summary>
     /// Скачать все файлы в списке.

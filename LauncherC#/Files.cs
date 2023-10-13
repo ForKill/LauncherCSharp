@@ -42,7 +42,9 @@ namespace LauncherC_
       return false;
     }
 
-    public override int GetHashCode() =>
-      HashCode.Combine(Path, Hash, WriteTimeHash);
+    public override int GetHashCode()
+    {
+      return HashCode.Combine(Path, Hash, WriteTimeHash);
+    }
   }
 }

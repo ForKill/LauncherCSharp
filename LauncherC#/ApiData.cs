@@ -59,7 +59,10 @@ namespace LauncherC_
       return false;
     }
 
-    public override int GetHashCode() => HashCode.Combine(Name, Path, Hash, Size);
+    public override int GetHashCode()
+    {
+      return HashCode.Combine(Name, Path, Hash, Size);
+    }
 
   }
 
@@ -101,7 +104,10 @@ namespace LauncherC_
       return false;
     }
 
-    public override int GetHashCode() => HashCode.Combine(Hash, Version);
+    public override int GetHashCode()
+    {
+      return HashCode.Combine(Hash, Version);
+    }
   }
 
   #endregion

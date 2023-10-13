@@ -61,7 +61,10 @@ public class NetworkSpeed
   /// Добавляет полученные данные к расчету.
   /// </summary>
   /// <param name="received">Объем полученных данных в байтах.</param>
-  public static void AddInfo(long received) => ReceivedStorage.Enqueue(received);
+  public static void AddInfo(long received)
+  {
+    ReceivedStorage.Enqueue(received);
+  }
 
   /// <summary>
   /// Событие срабатывает при обновлении общей скорости.
@@ -89,10 +92,16 @@ public class NetworkSpeed
     /// Инициализирует новый экземпляр класса LimitedConcurrentQueue с указанным ограничением.
     /// </summary>
     /// <param name="limit">Максимальное количество элементов, которые может содержать очередь.</param>
-    public LimitedConcurrentQueue(uint limit) => Limit = limit;
+    public LimitedConcurrentQueue(uint limit)
+    {
+      Limit = limit;
+    }
   }
 
-  private static void OnUpdated(double obj) => Updated?.Invoke(obj);
+  private static void OnUpdated(double obj)
+  {
+    Updated?.Invoke(obj);
+  }
 
   #endregion
 }
